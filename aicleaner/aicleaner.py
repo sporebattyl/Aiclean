@@ -114,55 +114,26 @@ class AICleaner:
 
     def _handle_todolist(self):
         """
-        Returns the configured to-do list entity ID or a default.
+        Returns the configured to-do list entity ID.
+        Raises ValueError if the to-do list is not configured, as programmatic
+        creation is no longer supported in Home Assistant.
         """
         configured_list = self.config['home_assistant'].get('todolist_entity_id')
+        
+        # The 'null' string check is for when the addon config is saved with an empty optional field.
         if configured_list and configured_list.lower() != 'null':
             logging.info(f"Using user-configured to-do list: {configured_list}")
             return configured_list
         else:
-            default_list = "todo.ai_cleaner_tasks"
-            logging.info(f"No to-do list configured. Defaulting to '{default_list}'.")
-            self._ensure_todolist_exists(default_list)
-            return default_list
-
-    def _ensure_todolist_exists(self, list_entity_id):
-        """
-        Checks if a to-do list exists and creates it if it doesn't.
-        """
-        logging.info(f"Checking for existence of to-do list: {list_entity_id}")
-        check_url = f"{self.ha_url}/api/states/{list_entity_id}"
-        
-        try:
-            response = requests.get(check_url, headers=self.ha_headers, timeout=10)
-            if response.status_code == 200:
-                logging.info(f"To-do list '{list_entity_id}' already exists.")
-                return
-            # If not 200, we assume it might not exist, especially on 404.
-            # Proceed to creation.
-        except requests.exceptions.RequestException as e:
-            logging.error(f"Error checking for to-do list existence: {e}. Will attempt to create it.")
-
-        logging.info(f"To-do list '{list_entity_id}' not found. Attempting to create it.")
-        create_url = f"{self.ha_url}/api/services/todo/create_list"
-        payload = {
-            "name": "AI Cleaner Tasks" # The friendly name for the new list
-        }
-        
-        try:
-            # This service call creates a new list, but the entity_id is slugified from the name.
-            # 'AI Cleaner Tasks' becomes 'todo.ai_cleaner_tasks', which matches our default.
-            response = requests.post(create_url, headers=self.ha_headers, json=payload, timeout=10)
-            # If the list already exists, the API may return a 400 Bad Request.
-            # We can treat this as a success condition for our purpose.
-            if response.status_code >= 400:
-                logging.warning(f"Could not create to-do list '{list_entity_id}' (it may already exist). "
-                              f"API Response: {response.text}")
-            else:
-                logging.info(f"Successfully created to-do list '{list_entity_id}'.")
-        except requests.exceptions.RequestException as e:
-            logging.error(f"Failed to create to-do list '{list_entity_id}' due to a network error: {e}")
-            logging.error("Please create the to-do list manually in Home Assistant.")
+            # Based on current HA documentation, lists cannot be created via service calls.
+            # The user MUST create a list in the UI and provide the entity_id in the config.
+            logging.error("To-do list entity ID is not configured in the add-on settings.")
+            raise ValueError(
+                "No to-do list entity ID was provided in the configuration. "
+                "Please go to the add-on configuration, create a to-do list in Home Assistant's "
+                "UI (under Settings > Devices & Services > Add Integration > To-do List), "
+                "and then enter the new list's entity ID (e.g., 'todo.my_list')."
+            )
 
     def get_camera_snapshot(self):
         """
