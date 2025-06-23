@@ -20,7 +20,7 @@ while true; do
   export CAMERA_ENTITY API_KEY TODO_LIST SENSOR_ENTITY
 
   # Execute the main Python application
-  python3 /app/aicleaner.py
+  python3 /app/aicleaner/aicleaner.py
 
   bashio::log.info "Analysis complete. Sleeping for ${FREQUENCY_MINUTES} minute(s)."
   sleep "${SLEEP_TIME}"

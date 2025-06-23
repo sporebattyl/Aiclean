@@ -117,14 +117,47 @@ class AICleaner:
         Returns the configured to-do list entity ID or a default.
         """
         configured_list = self.config['home_assistant'].get('todolist_entity_id')
-        if configured_list:
+        if configured_list and configured_list.lower() != 'null':
             logging.info(f"Using user-configured to-do list: {configured_list}")
             return configured_list
         else:
             default_list = "todo.ai_cleaner_tasks"
             logging.info(f"No to-do list configured. Defaulting to '{default_list}'.")
-            logging.warning(f"Please ensure the to-do list '{default_list}' exists in Home Assistant.")
+            self._ensure_todolist_exists(default_list)
             return default_list
+
+    def _ensure_todolist_exists(self, list_entity_id):
+        """
+        Checks if a to-do list exists and creates it if it doesn't.
+        """
+        logging.info(f"Checking for existence of to-do list: {list_entity_id}")
+        check_url = f"{self.ha_url}/api/states/{list_entity_id}"
+        
+        try:
+            response = requests.get(check_url, headers=self.ha_headers, timeout=10)
+            if response.status_code == 200:
+                logging.info(f"To-do list '{list_entity_id}' already exists.")
+                return
+            # If not 200, we assume it might not exist, especially on 404.
+            # Proceed to creation.
+        except requests.exceptions.RequestException as e:
+            logging.error(f"Error checking for to-do list existence: {e}. Will attempt to create it.")
+
+        logging.info(f"To-do list '{list_entity_id}' not found. Attempting to create it.")
+        create_url = f"{self.ha_url}/api/services/todo/create_list"
+        payload = {
+            "name": "AI Cleaner Tasks" # The friendly name for the new list
+        }
+        
+        try:
+            # This service call creates a new list, but the entity_id is slugified from the name.
+            # 'AI Cleaner Tasks' becomes 'todo.ai_cleaner_tasks', which matches our default.
+            response = requests.post(create_url, headers=self.ha_headers, json=payload, timeout=10)
+            response.raise_for_status()
+            logging.info(f"Successfully created to-do list '{list_entity_id}'.")
+        except requests.exceptions.RequestException as e:
+            logging.error(f"Failed to create to-do list '{list_entity_id}': {e}")
+            logging.error("Please create the to-do list manually in Home Assistant.")
 
     def get_camera_snapshot(self):
         """
