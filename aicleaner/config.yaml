@@ -14,6 +14,9 @@ homeassistant_api: true
 schema:
   camera_entity: str
   gemini_api_key: password
-  todo_list_entity: str
-  sensor_entity_id: str
-  update_frequency: 'int(1,168)'
+  todo_list_entity: str?
+  sensor_entity_id: str?
+  update_frequency: 'int?'
+options:
+  sensor_entity_id: "sensor.aicleaner_cleanliness_score"
+  update_frequency: 60

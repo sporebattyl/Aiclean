@@ -24,8 +24,9 @@ class AICleaner:
             "content-type": "application/json",
         }
         self.camera_entity_id = self.config['home_assistant']['camera_entity_id']
-        self.todolist_entity_id = self.config['home_assistant']['todolist_entity_id']
         self.sensor_entity_id = self.config['home_assistant']['sensor_entity_id']
+        # Handle the todolist entity, defaulting if not provided.
+        self.todolist_entity_id = self._handle_todolist()
         
         # Gemini Configuration
         gemini_api_key = self.config['google_gemini']['api_key']
@@ -34,8 +35,6 @@ class AICleaner:
         genai.configure(api_key=gemini_api_key)
         self.gemini_model = genai.GenerativeModel('gemini-pro-vision')
 
-        # Application Configuration
-        self.analysis_interval = self.config['application']['analysis_interval_minutes'] * 60
 
     def _load_config(self):
         """
@@ -67,10 +66,6 @@ class AICleaner:
             "google_gemini": {
                 "api_key": os.environ.get('API_KEY'),
             },
-            "application": {
-                # Update frequency from run.sh is in hours, convert to minutes
-                "analysis_interval_minutes": int(os.environ.get('FREQUENCY', 24))
-            }
         }
 
     def _load_from_yaml(self, config_path):
@@ -85,14 +80,13 @@ class AICleaner:
 
     def _validate_config(self):
         """
-        Validates the loaded configuration to ensure all required keys are present.
+        Validates the loaded configuration to ensure critical keys are present.
         Raises ValueError if a required key is missing.
         """
         logging.info("Validating configuration.")
-        required_ha_keys = [
-            "api_url", "token", "camera_entity_id",
-            "todolist_entity_id", "sensor_entity_id"
-        ]
+        # Only camera and api_key are strictly required for the script to function.
+        # The others have defaults or are handled gracefully.
+        required_ha_keys = ["api_url", "token", "camera_entity_id"]
         required_gemini_keys = ["api_key"]
         
         if "home_assistant" not in self.config:
@@ -110,6 +104,20 @@ class AICleaner:
                 raise ValueError(f"Missing required Google Gemini configuration key: '{key}'")
         
         logging.info("Configuration validation successful.")
+
+    def _handle_todolist(self):
+        """
+        Returns the configured to-do list entity ID or a default.
+        """
+        configured_list = self.config['home_assistant'].get('todolist_entity_id')
+        if configured_list:
+            logging.info(f"Using user-configured to-do list: {configured_list}")
+            return configured_list
+        else:
+            default_list = "todo.ai_cleaner_tasks"
+            logging.info(f"No to-do list configured. Defaulting to '{default_list}'.")
+            logging.warning(f"Please ensure the to-do list '{default_list}' exists in Home Assistant.")
+            return default_list
 
     def get_camera_snapshot(self):
         """
@@ -220,8 +228,8 @@ class AICleaner:
         """
         Populates the specified Home Assistant to-do list with tasks from Gemini.
         """
-        if not tasks:
-            logging.info("No tasks to add to the to-do list.")
+        if not tasks or not self.todolist_entity_id:
+            logging.info("No tasks to add or to-do list entity is not configured.")
             return
 
         logging.info(f"Updating todolist {self.todolist_entity_id} with {len(tasks)} tasks.")
@@ -241,33 +249,30 @@ class AICleaner:
 
     def run(self):
         """
-        The main application loop.
+        Runs a single analysis cycle.
         """
-        logging.info("Starting AICleaner main loop.")
-        while True:
-            logging.info("Starting new analysis cycle.")
-            # 1. Get camera snapshot
-            image_path = self.get_camera_snapshot()
+        logging.info("Starting new analysis cycle.")
+        # 1. Get camera snapshot
+        image_path = self.get_camera_snapshot()
 
-            if image_path:
-                # 2. Analyze with Gemini
-                analysis = self.analyze_image_with_gemini(image_path)
-                
-                if analysis:
-                    score = analysis.get("score")
-                    tasks = analysis.get("tasks")
-
-                    # 3. Update Home Assistant
-                    if score is not None:
-                        self.update_ha_sensor(score)
-                    if tasks:
-                        self.update_ha_todolist(tasks)
-                
-                # Clean up the snapshot file
-                os.remove(image_path)
+        if image_path:
+            # 2. Analyze with Gemini
+            analysis = self.analyze_image_with_gemini(image_path)
             
-            logging.info(f"Sleeping for {self.analysis_interval / 60} minutes.")
-            time.sleep(self.analysis_interval)
+            if analysis:
+                score = analysis.get("score")
+                tasks = analysis.get("tasks")
+
+                # 3. Update Home Assistant
+                if score is not None:
+                    self.update_ha_sensor(score)
+                if tasks:
+                    self.update_ha_todolist(tasks)
+            
+            # Clean up the snapshot file
+            os.remove(image_path)
+        
+        logging.info("Analysis cycle complete.")
 
 
 if __name__ == "__main__":
