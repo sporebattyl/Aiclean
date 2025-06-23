@@ -1,6 +1,6 @@
-requests
-pyyaml
-google-generativeai
+requests==2.32.3
+PyYAML==6.0.1
+google-generativeai==0.5.4
 pytest
 pytest-mock
 requests-mock

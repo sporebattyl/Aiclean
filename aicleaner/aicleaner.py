@@ -51,14 +51,19 @@ class AICleaner:
 
     def _load_from_env(self):
         """Loads configuration from environment variables."""
-        supervisor_api = os.environ.get('SUPERVISOR_API')
-        if not supervisor_api:
-            raise ValueError("SUPERVISOR_API environment variable not found. Cannot determine Home Assistant URL.")
+        # The supervisor hostname provides a reliable way to construct the API URL.
+        # The base URL for Home Assistant's API is http://supervisor/core
+        ha_api_url = "http://supervisor/core"
+        
+        supervisor_token = os.environ.get('SUPERVISOR_TOKEN')
+        if not supervisor_token:
+            # This is a critical failure, as we can't authenticate.
+            raise ValueError("SUPERVISOR_TOKEN environment variable not found. Cannot authenticate with Home Assistant.")
 
         return {
             "home_assistant": {
-                "api_url": supervisor_api.replace("/api",""), # Get base URL
-                "token": os.environ.get('SUPERVISOR_TOKEN'),
+                "api_url": ha_api_url,
+                "token": supervisor_token,
                 "camera_entity_id": os.environ.get('CAMERA_ENTITY'),
                 "todolist_entity_id": os.environ.get('TODO_LIST'),
                 "sensor_entity_id": os.environ.get('SENSOR_ENTITY'),
