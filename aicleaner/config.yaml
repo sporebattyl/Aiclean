@@ -11,12 +11,6 @@ startup: "application"
 boot: "auto"
 init: false
 homeassistant_api: true
-options:
-  camera_entity: null
-  gemini_api_key: null
-  todo_list_entity: null
-  sensor_entity_id: null
-  update_frequency: 24
 schema:
   camera_entity: str
   gemini_api_key: password
