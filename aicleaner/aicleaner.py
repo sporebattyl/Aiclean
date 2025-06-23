@@ -153,10 +153,15 @@ class AICleaner:
             # This service call creates a new list, but the entity_id is slugified from the name.
             # 'AI Cleaner Tasks' becomes 'todo.ai_cleaner_tasks', which matches our default.
             response = requests.post(create_url, headers=self.ha_headers, json=payload, timeout=10)
-            response.raise_for_status()
-            logging.info(f"Successfully created to-do list '{list_entity_id}'.")
+            # If the list already exists, the API may return a 400 Bad Request.
+            # We can treat this as a success condition for our purpose.
+            if response.status_code >= 400:
+                logging.warning(f"Could not create to-do list '{list_entity_id}' (it may already exist). "
+                              f"API Response: {response.text}")
+            else:
+                logging.info(f"Successfully created to-do list '{list_entity_id}'.")
         except requests.exceptions.RequestException as e:
-            logging.error(f"Failed to create to-do list '{list_entity_id}': {e}")
+            logging.error(f"Failed to create to-do list '{list_entity_id}' due to a network error: {e}")
             logging.error("Please create the to-do list manually in Home Assistant.")
 
     def get_camera_snapshot(self):
