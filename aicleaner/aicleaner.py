@@ -2,8 +2,10 @@ import os
 import time
 import yaml
 import requests
-import google.generativeai as genai
+from google.generativeai.client import configure
+from google.generativeai.generative_models import GenerativeModel
 import logging
+from PIL import Image
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -32,8 +34,8 @@ class AICleaner:
         gemini_api_key = self.config['google_gemini']['api_key']
         if not gemini_api_key:
             raise ValueError("Google Gemini API key is not configured.")
-        genai.configure(api_key=gemini_api_key)
-        self.gemini_model = genai.GenerativeModel('gemini-pro-vision')
+        configure(api_key=gemini_api_key)
+        self.gemini_model = GenerativeModel('gemini-1.5-pro')
 
 
     def _load_config(self):
@@ -157,7 +159,7 @@ class AICleaner:
 
         logging.info(f"Analyzing image: {image_path}")
         try:
-            image_file = genai.upload_file(path=image_path)
+            img = Image.open(image_path)
             prompt = """
             Analyze the provided image of a room and perform the following tasks:
             1.  Rate the overall cleanliness of the room on a scale of 1 to 100, where 1 is extremely messy and 100 is perfectly clean.
@@ -177,7 +179,7 @@ class AICleaner:
               ]
             }
             """
-            response = self.gemini_model.generate_content([prompt, image_file])
+            response = self.gemini_model.generate_content([prompt, img])
             return self._parse_gemini_response(response.text)
             
         except Exception as e:
