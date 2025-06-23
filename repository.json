@@ -1,5 +1,7 @@
 {
   "name": "Roo AI Cleaning Assistant Repository",
   "url": "https://github.com/sporebattyl/hass-addon-aicleaner",
-  "maintainer": "sporebattyl"
+  "maintainer": "sporebattyl",
+  "location": "aicleaner",
+  "category": "AI"
 }
