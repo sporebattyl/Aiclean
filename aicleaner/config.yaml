@@ -19,7 +19,7 @@ options:
   update_frequency: 24
 schema:
   camera_entity: str
-  gemini_api_key: secret
+  gemini_api_key: password
   todo_list_entity: str
   sensor_entity_id: str
-  update_frequency: int(1, 168)
+  update_frequency: 'int(1,168)'
