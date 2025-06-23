@@ -1,6 +1,6 @@
 {
   "name": "Roo AI Cleaning Assistant Repository",
-  "url": "https://github.com/sporebattyl/hass-addon-aicleaner",
+  "url": "https://github.com/sporebattyl/Aiclean",
   "maintainer": "sporebattyl",
   "addons": {
     "aicleaner": {
@@ -9,7 +9,7 @@
       "version": "0.1.0",
       "slug": "aicleaner",
       "description": "AI-powered room cleanliness analysis and to-do list generator.",
-      "url": "https://github.com/sporebattyl/hass-addon-aicleaner",
+      "url": "https://github.com/sporebattyl/Aiclean",
       "arch": [
         "aarch64",
         "amd64",
