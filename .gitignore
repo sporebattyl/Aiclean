@@ -136,3 +136,16 @@ cython_debug/
 
 # VSCode
 .vscode/
+# Project-specific files
+DesignDocument.md
+generate_mcp_yaml.py
+install_rooflow_conport.cmd
+pytest.ini
+"Roo - Home Assistant AI Cleaning Assistant Project Plan & Development Documentation.md"
+system_prompt.md
+tests/
+context_portal/
+.roomodes
+context_portal/context.db
+context_portal/conport_vector_data/chroma.sqlite3
+context_portal/conport_vector_data/5ed34b5c-1395-4ec9-9429-ee4207b89ceb/length.bin
