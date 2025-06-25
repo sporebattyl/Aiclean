@@ -2,8 +2,6 @@ requests==2.32.3
 PyYAML==6.0.1
 google-generativeai==0.5.4
 Pillow==10.4.0
-Flask==3.0.0
-Flask-CORS==4.0.0
 pytest
 pytest-mock
 requests-mock

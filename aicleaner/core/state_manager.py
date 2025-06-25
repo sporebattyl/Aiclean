@@ -10,10 +10,9 @@ from .zone_manager import ZoneManager
 from .task_tracker import TaskTracker
 from .ai_analyzer import AIAnalyzer
 from ..data import (
-    TaskHistoryRepository, PerformanceMetricsRepository,
-    TaskHistory, PerformanceMetrics, Zone, get_database
+    TaskHistoryRepository, PerformanceMetricsRepository, 
+    TaskHistory, PerformanceMetrics, Zone
 )
-from ..analytics import AnalyticsCollector
 
 
 class StateManager:
@@ -21,19 +20,16 @@ class StateManager:
     
     def __init__(self, gemini_api_key: str):
         self.logger = logging.getLogger(__name__)
-
+        
         # Initialize core components
         self.zone_manager = ZoneManager()
         self.task_tracker = TaskTracker()
         self.ai_analyzer = AIAnalyzer(gemini_api_key)
-
+        
         # Initialize repositories
         self.history_repo = TaskHistoryRepository()
         self.metrics_repo = PerformanceMetricsRepository()
-
-        # Initialize analytics
-        self.analytics_collector = AnalyticsCollector(get_database())
-
+        
         self.logger.info("State Manager initialized successfully")
     
     def run_analysis_cycle(self, zone_id: int = None) -> Dict[str, Any]:
@@ -371,44 +367,3 @@ class StateManager:
                 'system_healthy': False,
                 'error': str(e)
             }
-
-    def trigger_analytics_collection(self, zone_id: Optional[int] = None,
-                                   target_date: Optional[date] = None) -> Dict[str, Any]:
-        """
-        Trigger analytics collection for historical data processing
-
-        Args:
-            zone_id: Specific zone to collect for, or None for all zones
-            target_date: Date to collect for, or None for yesterday
-
-        Returns:
-            Collection results
-        """
-        try:
-            if zone_id:
-                success = self.analytics_collector.collect_daily_metrics(zone_id, target_date)
-                return {
-                    'success': success,
-                    'zone_id': zone_id,
-                    'date': target_date.isoformat() if target_date else 'yesterday'
-                }
-            else:
-                results = self.analytics_collector.collect_all_zones_metrics(target_date)
-                return {
-                    'results': results,
-                    'total_zones': len(results),
-                    'successful_zones': sum(1 for success in results.values() if success),
-                    'date': target_date.isoformat() if target_date else 'yesterday'
-                }
-
-        except Exception as e:
-            self.logger.error(f"Failed to trigger analytics collection: {e}")
-            return {'error': str(e)}
-
-    def get_analytics_status(self) -> Dict[str, Any]:
-        """Get analytics collection status"""
-        try:
-            return self.analytics_collector.get_collection_status()
-        except Exception as e:
-            self.logger.error(f"Failed to get analytics status: {e}")
-            return {'error': str(e)}
