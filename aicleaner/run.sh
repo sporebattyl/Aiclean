@@ -1,27 +1,22 @@
 #!/usr/bin/with-contenv bashio
 
-bashio::log.info "Starting Roo AI Cleaning Assistant..."
+bashio::log.info "Starting Roo AI Cleaning Assistant v2.0..."
 
 # Read configuration into variables
-# Read configuration using bashio, respecting defaults from config.yaml
-CAMERA_ENTITY=$(bashio::config 'camera_entity')
 API_KEY=$(bashio::config 'gemini_api_key')
-TODO_LIST=$(bashio::config 'todo_list_entity')
-SENSOR_ENTITY=$(bashio::config 'sensor_entity_id')
-# The frequency is now in minutes, convert to seconds for sleep
-FREQUENCY_MINUTES=$(bashio::config 'update_frequency')
-SLEEP_TIME=$((FREQUENCY_MINUTES * 60))
+DEFAULT_PERSONALITY=$(bashio::config 'default_personality')
+GLOBAL_NOTIFICATIONS=$(bashio::config 'global_notifications')
+DATABASE_PATH=$(bashio::config 'database_path')
+LOG_LEVEL=$(bashio::config 'log_level')
 
-# Main execution loop
-while true; do
-  bashio::log.info "Running cleanliness analysis..."
+# Export variables for the Python application to access
+export API_KEY DEFAULT_PERSONALITY GLOBAL_NOTIFICATIONS DATABASE_PATH LOG_LEVEL
 
-  # Export variables for the Python script to access
-  export CAMERA_ENTITY API_KEY TODO_LIST SENSOR_ENTITY
+# Set Python path
+export PYTHONPATH="/app:$PYTHONPATH"
 
-  # Execute the main Python application
-  python3 /app/aicleaner.py
+bashio::log.info "Starting Roo v2.0 Flask application..."
 
-  bashio::log.info "Analysis complete. Sleeping for ${FREQUENCY_MINUTES} minute(s)."
-  sleep "${SLEEP_TIME}"
-done
+# Execute the main Python application (Flask server)
+cd /app
+python3 -m aicleaner.app

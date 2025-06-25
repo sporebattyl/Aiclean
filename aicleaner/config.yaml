@@ -1,7 +1,7 @@
 name: "Roo AI Cleaning Assistant"
-version: "0.1.0"
+version: "2.0.0"
 slug: "aicleaner"
-description: "AI-powered room cleanliness analysis and to-do list generator."
+description: "AI-powered multi-zone home management assistant with advanced analytics"
 url: "https://github.com/sporebattyl/Aiclean"
 arch:
   - aarch64
@@ -11,12 +11,19 @@ startup: "application"
 boot: "auto"
 init: false
 homeassistant_api: true
+ingress: true
+panel_icon: "mdi:robot-vacuum"
+panel_title: "Roo Assistant"
+ports:
+  8099/tcp: 8099
 schema:
-  camera_entity: str
   gemini_api_key: password
-  todo_list_entity: str?
-  sensor_entity_id: str?
-  update_frequency: 'int?'
+  default_personality: list(concise|snarky|encouraging)?
+  global_notifications: bool?
+  database_path: str?
+  log_level: list(DEBUG|INFO|WARNING|ERROR)?
 options:
-  sensor_entity_id: "sensor.aicleaner_cleanliness_score"
-  update_frequency: 60
+  default_personality: "concise"
+  global_notifications: true
+  database_path: "/data/roo.db"
+  log_level: "INFO"
