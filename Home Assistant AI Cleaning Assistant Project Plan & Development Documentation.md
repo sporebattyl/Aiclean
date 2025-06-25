@@ -1,4 +1,4 @@
-# Roo - Home Assistant AI Cleaning Assistant
+# Home Assistant AI Cleaning Assistant
 ## Project Plan & Development Documentation
 
 ---

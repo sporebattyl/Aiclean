@@ -1,4 +1,4 @@
-# Roo AI Cleaning Assistant - Design Document
+# AI Cleaning Assistant - Design Document
 
 This document is the single source of truth for all code structure, patterns, and style for the AICleaner Home Assistant add-on.
 
