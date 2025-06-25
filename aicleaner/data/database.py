@@ -11,13 +11,42 @@ from pathlib import Path
 
 class DatabaseManager:
     """Manages SQLite database connections and migrations"""
-    
+
     def __init__(self, db_path: str = "/data/roo.db"):
         self.db_path = db_path
         self.logger = logging.getLogger(__name__)
         self._ensure_database_directory()
         self._initialize_database()
-    
+
+        # Initialize advanced components (lazy loading to avoid circular imports)
+        self._backup_manager = None
+        self._archive_manager = None
+        self._performance_monitor = None
+
+    @property
+    def backup_manager(self):
+        """Get backup manager instance (lazy loaded)"""
+        if self._backup_manager is None:
+            from .backup_manager import BackupManager
+            self._backup_manager = BackupManager(self.db_path)
+        return self._backup_manager
+
+    @property
+    def archive_manager(self):
+        """Get archive manager instance (lazy loaded)"""
+        if self._archive_manager is None:
+            from .archive_manager import ArchiveManager
+            self._archive_manager = ArchiveManager(self)
+        return self._archive_manager
+
+    @property
+    def performance_monitor(self):
+        """Get performance monitor instance (lazy loaded)"""
+        if self._performance_monitor is None:
+            from .performance_monitor import PerformanceMonitor
+            self._performance_monitor = PerformanceMonitor(self)
+        return self._performance_monitor
+
     def _ensure_database_directory(self):
         """Ensure the database directory exists"""
         db_dir = os.path.dirname(self.db_path)
@@ -229,6 +258,53 @@ class DatabaseManager:
         except Exception as e:
             self.logger.error(f"Failed to vacuum database: {e}")
             return False
+
+    # Enhanced methods using new components
+
+    def create_backup(self, backup_name: Optional[str] = None, compress: bool = True) -> str:
+        """Create a backup using the backup manager"""
+        return self.backup_manager.create_backup(backup_name, compress)
+
+    def restore_backup(self, backup_path: str, confirm: bool = False) -> bool:
+        """Restore from backup using the backup manager"""
+        return self.backup_manager.restore_backup(backup_path, confirm)
+
+    def list_backups(self) -> List[Dict[str, Any]]:
+        """List all available backups"""
+        return self.backup_manager.list_backups()
+
+    def archive_old_data(self, table_name: Optional[str] = None, dry_run: bool = False) -> Dict[str, Any]:
+        """Archive old data using the archive manager"""
+        return self.archive_manager.archive_old_data(table_name, dry_run)
+
+    def get_archive_statistics(self) -> Dict[str, Any]:
+        """Get archive statistics"""
+        return self.archive_manager.get_archive_statistics()
+
+    def get_performance_report(self) -> Dict[str, Any]:
+        """Get comprehensive performance report"""
+        return self.performance_monitor.get_performance_report()
+
+    def check_performance_alerts(self) -> List[Dict[str, Any]]:
+        """Check for performance issues"""
+        return self.performance_monitor.check_performance_alerts()
+
+    def optimize_performance(self) -> Dict[str, Any]:
+        """Optimize database performance"""
+        # Run archive cleanup
+        archive_result = self.archive_manager.archive_old_data(dry_run=False)
+
+        # Optimize database settings
+        settings_result = self.performance_monitor.optimize_database_settings()
+
+        # Run database optimization
+        optimization_result = self.archive_manager.optimize_database()
+
+        return {
+            'archive_cleanup': archive_result,
+            'settings_optimization': settings_result,
+            'database_optimization': optimization_result
+        }
 
 
 # Global database instance
