@@ -2,18 +2,17 @@
 ARG BUILD_FROM
 FROM ${BUILD_FROM}
 
-# Set the working directory
+# Set the working directory inside the container
 WORKDIR /app
 
-# Copy the application files
-COPY aicleaner.py .
-COPY run.sh .
+# Copy only the requirements file first for better Docker layer caching
 COPY requirements.txt .
 
 # Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Make run.sh executable
+# Copy the run script and make it executable
+COPY run.sh .
 RUN chmod a+x run.sh
 
 # Start the application
