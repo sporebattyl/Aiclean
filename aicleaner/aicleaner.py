@@ -15,12 +15,14 @@ from PIL import Image
 try:
     from .notification_engine import NotificationEngine
     from .ignore_rules_manager import IgnoreRulesManager
+    from .configuration_manager import ConfigurationManager
 except ImportError:
     # Fallback for development/testing
     import sys
     sys.path.append(os.path.dirname(__file__))
     from notification_engine import NotificationEngine
     from ignore_rules_manager import IgnoreRulesManager
+    from configuration_manager import ConfigurationManager
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -1576,6 +1578,9 @@ class AICleaner:
         """
         logging.info("Initializing AICleaner v2.0 with multi-zone support")
 
+        # Initialize configuration manager
+        self.config_manager = ConfigurationManager()
+
         # Load and validate configuration
         self.config = self._load_config()
         self._validate_config()
@@ -1606,8 +1611,7 @@ class AICleaner:
 
     def _load_config(self):
         """
-        Loads configuration from environment variables (for HA Add-on)
-        or from a YAML file (for local development).
+        Loads configuration using ConfigurationManager
         """
         # SUPERVISOR_TOKEN is a reliable indicator of the HA Add-on environment
         if 'SUPERVISOR_TOKEN' in os.environ:
@@ -1615,7 +1619,14 @@ class AICleaner:
             return self._load_from_addon_env()
         else:
             logging.info("Loading configuration from local development environment")
-            return self._load_from_local_env()
+            # Use configuration manager for local development
+            config = self.config_manager.load_configuration()
+
+            # Add HA API details for local development
+            config['ha_api_url'] = os.getenv('HA_API_URL', 'http://localhost:8123/api')
+            config['ha_token'] = os.getenv('HA_TOKEN', '')
+
+            return config
 
     def _load_from_addon_env(self):
         """Loads configuration from Home Assistant addon environment"""
@@ -1669,39 +1680,47 @@ class AICleaner:
             return config
 
     def _validate_config(self):
-        """Validates the loaded configuration for v2.0 requirements"""
+        """Validates the loaded configuration for v2.0 requirements using ConfigurationManager"""
         logging.info("Validating v2.0 configuration")
 
-        # Check required top-level keys
-        if 'gemini_api_key' not in self.config or not self.config['gemini_api_key']:
-            raise ValueError("Missing required configuration: 'gemini_api_key'")
+        # Use configuration manager for validation
+        is_valid = self.config_manager.validate_configuration(self.config)
 
-        if 'zones' not in self.config:
-            raise ValueError("Missing required configuration: 'zones'")
+        if not is_valid:
+            errors = self.config_manager.get_validation_errors()
+            guidance = self.config_manager.get_startup_guidance()
 
-        # Validate each zone configuration
-        for i, zone_config in enumerate(self.config['zones']):
-            self._validate_zone_config(zone_config, i)
+            # Log detailed error information
+            logging.error("Configuration validation failed:")
+            for error in errors:
+                logging.error(f"  - {error}")
 
-        logging.info(f"Configuration validated successfully with {len(self.config['zones'])} zones")
+            # Print guidance to console for user visibility
+            print("\n" + guidance + "\n")
+
+            # Raise exception with first error for backward compatibility
+            raise ValueError(f"Configuration validation failed: {errors[0] if errors else 'Unknown error'}")
+
+        # Check if configuration is complete enough to start
+        if not self.config_manager.is_configuration_complete(self.config):
+            guidance = self.config_manager.get_startup_guidance()
+            print("\n" + guidance + "\n")
+            raise ValueError("Configuration is incomplete - missing required settings")
+
+        logging.info(f"Configuration validated successfully with {len(self.config.get('zones', []))} zones")
 
     def _validate_zone_config(self, zone_config, index):
-        """Validates a single zone configuration"""
-        required_fields = ['name', 'camera_entity', 'todo_list_entity', 'update_frequency']
-
-        for field in required_fields:
-            if field not in zone_config or not zone_config[field]:
-                raise ValueError(f"Zone {index}: Missing required field '{field}'")
-
-        # Validate update frequency
-        if not isinstance(zone_config['update_frequency'], int) or zone_config['update_frequency'] < 1:
-            raise ValueError(f"Zone {index}: update_frequency must be an integer >= 1")
-
-        # Validate notification personality if specified
-        if 'notification_personality' in zone_config:
-            valid_personalities = ['default', 'roaster', 'comedian', 'jarvis', 'sargent', 'snarky']
-            if zone_config['notification_personality'] not in valid_personalities:
-                raise ValueError(f"Zone {index}: Invalid notification_personality")
+        """
+        Legacy zone validation method - now delegated to ConfigurationManager
+        Kept for backward compatibility
+        """
+        # This method is now handled by ConfigurationManager
+        # but kept for any legacy code that might call it directly
+        temp_config = {'zones': [zone_config]}
+        if not self.config_manager.validate_configuration(temp_config):
+            errors = self.config_manager.get_validation_errors()
+            if errors:
+                raise ValueError(f"Zone {index}: {errors[0]}")
 
     def _create_ha_client(self):
         """Creates Home Assistant API client"""

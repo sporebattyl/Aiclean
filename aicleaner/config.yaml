@@ -24,9 +24,21 @@ map:
   - "backup:ro"
 
 options:
-  gemini_api_key: null
+  gemini_api_key: "AIzaSyExample_API_Key_Replace_With_Your_Key"
   display_name: "User"
-  zones: []
+  zones:
+    - name: "kitchen"
+      icon: "mdi:chef-hat"
+      purpose: "Keep the kitchen clean and organized"
+      camera_entity: "camera.kitchen"
+      todo_list_entity: "todo.kitchen_tasks"
+      update_frequency: 30
+      notifications_enabled: true
+      notification_service: "mobile_app_your_phone"
+      notification_personality: "default"
+      notify_on_create: true
+      notify_on_complete: true
+
 schema:
   gemini_api_key: password
   display_name: str
@@ -39,6 +51,6 @@ schema:
       update_frequency: int(1,168)
       notifications_enabled: bool
       notification_service: str?
-      notification_personality: list(default|roaster|comedian|jarvis|sargent|snarky)
+      notification_personality: list(default|snarky|jarvis|roaster|butler|coach|zen)
       notify_on_create: bool
       notify_on_complete: bool

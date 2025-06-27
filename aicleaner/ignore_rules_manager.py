@@ -7,9 +7,15 @@ import logging
 import uuid
 from typing import List, Dict, Any, Optional
 from datetime import datetime
-from .rule_validator import RuleValidator
-from .rule_matcher import RuleMatcher
-from .rule_persistence import RulePersistence
+try:
+    from .rule_validator import RuleValidator
+    from .rule_matcher import RuleMatcher
+    from .rule_persistence import RulePersistence
+except ImportError:
+    # Fallback for standalone execution
+    from rule_validator import RuleValidator
+    from rule_matcher import RuleMatcher
+    from rule_persistence import RulePersistence
 
 logger = logging.getLogger(__name__)
 

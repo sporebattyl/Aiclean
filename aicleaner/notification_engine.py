@@ -5,9 +5,15 @@ Component-based design following TDD principles
 
 import logging
 from typing import Dict, Any, Optional
-from .personality_formatter import PersonalityFormatter
-from .message_template import MessageTemplate
-from .notification_sender import NotificationSender
+try:
+    from .personality_formatter import PersonalityFormatter
+    from .message_template import MessageTemplate
+    from .notification_sender import NotificationSender
+except ImportError:
+    # Fallback for standalone execution
+    from personality_formatter import PersonalityFormatter
+    from message_template import MessageTemplate
+    from notification_sender import NotificationSender
 
 logger = logging.getLogger(__name__)
 
