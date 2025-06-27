@@ -1,7 +1,7 @@
-name: "Roo AI Cleaning Assistant"
+name: "AICleaner v2.0"
 version: "2.0.0"
 slug: "aicleaner"
-description: "Intelligent, multi-zone cleanliness management for your home."
+description: "Intelligent, multi-zone cleanliness management with comprehensive Lovelace UI."
 url: "https://github.com/sporebattyl/Aiclean"
 arch:
   - aarch64
@@ -11,6 +11,10 @@ startup: "application"
 boot: "auto"
 init: false
 homeassistant_api: true
+ports:
+  8099/tcp: 8099
+ports_description:
+  8099/tcp: "Static file server for Lovelace cards"
 map:
   - "config:ro"
   - "share:rw"

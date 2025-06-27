@@ -11,9 +11,13 @@ COPY requirements.txt .
 # Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the run script and make it executable
+# Copy the application files
+COPY aicleaner.py .
 COPY run.sh .
 RUN chmod a+x run.sh
+
+# Copy the www directory for Lovelace cards
+COPY www/ /app/www/
 
 # Start the application
 CMD [ "./run.sh" ]
