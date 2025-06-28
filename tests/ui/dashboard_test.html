@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Component Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #f5f5f5;
+            --primary-color: #2196F3;
+            --text-primary-color: white;
+            --card-background-color: white;
+            --secondary-background-color: #f8f9fa;
+            --primary-text-color: #212121;
+            --secondary-text-color: #757575;
+            --divider-color: #e0e0e0;
+            --success-color: #4caf50;
+            --warning-color: #ff9800;
+            --error-color: #f44336;
+        }
+        
+        .test-section {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .test-result {
+            padding: 8px 12px;
+            margin: 5px 0;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .pass { background: #d4edda; color: #155724; }
+        .fail { background: #f8d7da; color: #721c24; }
+        
+        .card-container {
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            background: white;
+            min-height: 400px;
+        }
+        
+        .test-controls {
+            margin: 10px 0;
+        }
+        
+        .test-controls button {
+            margin: 5px;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            background: #2196F3;
+            color: white;
+            cursor: pointer;
+        }
+        
+        .test-controls button:hover {
+            background: #1976D2;
+        }
+    </style>
+</head>
+<body>
+    <h1>🏠 Dashboard Component Test</h1>
+    
+    <div class="test-section">
+        <h2>📊 Test Results</h2>
+        <div id="test-results">
+            <div class="test-result">⏳ Running dashboard tests...</div>
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h2>🎮 Test Controls</h2>
+        <div class="test-controls">
+            <button onclick="testBasicRendering()">Test Basic Rendering</button>
+            <button onclick="testWithMockData()">Test With Mock Data</button>
+            <button onclick="testNavigation()">Test Navigation</button>
+            <button onclick="testResponsive()">Test Responsive</button>
+            <button onclick="runAllTests()">Run All Tests</button>
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h2>🎨 Live Card Preview</h2>
+        <div class="card-container" id="card-container">
+            <!-- Card will be rendered here -->
+        </div>
+    </div>
+
+    <!-- Load the card -->
+    <script src="aicleaner-card.js"></script>
+    
+    <script>
+        let testCard = null;
+        const testResults = [];
+        
+        function addTestResult(name, passed, details = '') {
+            testResults.push({ name, passed, details });
+            updateTestDisplay();
+            console.log(`${passed ? '✅' : '❌'} ${name}${details ? ': ' + details : ''}`);
+        }
+        
+        function updateTestDisplay() {
+            const container = document.getElementById('test-results');
+            const passed = testResults.filter(r => r.passed).length;
+            const total = testResults.length;
+            
+            container.innerHTML = `
+                <div class="test-result ${passed === total ? 'pass' : 'fail'}">
+                    Dashboard Tests: ${passed}/${total} passed
+                </div>
+                ${testResults.map(result => `
+                    <div class="test-result ${result.passed ? 'pass' : 'fail'}">
+                        ${result.passed ? '✅' : '❌'} ${result.name}
+                        ${result.details ? `<br><small>${result.details}</small>` : ''}
+                    </div>
+                `).join('')}
+            `;
+        }
+        
+        function createTestCard() {
+            if (testCard) {
+                testCard.remove();
+            }
+            
+            testCard = document.createElement('aicleaner-card');
+            testCard.setConfig({
+                title: 'Test Dashboard',
+                show_analytics: true,
+                show_config: true
+            });
+            
+            document.getElementById('card-container').appendChild(testCard);
+            return testCard;
+        }
+        
+        async function testBasicRendering() {
+            console.log('🧪 Testing basic rendering...');
+            
+            try {
+                const card = createTestCard();
+                
+                // Wait for render
+                await new Promise(resolve => setTimeout(resolve, 100));
+                
+                // Test shadow DOM exists
+                const hasShadowRoot = card.shadowRoot !== null;
+                addTestResult('Shadow DOM creation', hasShadowRoot);
+                
+                // Test content exists
+                const hasContent = card.shadowRoot && card.shadowRoot.innerHTML.length > 0;
+                addTestResult('Content rendering', hasContent);
+                
+                // Test header exists
+                const hasHeader = card.shadowRoot.querySelector('.header') !== null;
+                addTestResult('Header rendering', hasHeader);
+                
+                // Test navigation exists
+                const hasNavigation = card.shadowRoot.querySelector('.navigation') !== null;
+                addTestResult('Navigation rendering', hasNavigation);
+                
+            } catch (error) {
+                addTestResult('Basic rendering', false, error.message);
+            }
+        }
+        
+        async function testWithMockData() {
+            console.log('🧪 Testing with mock data...');
+            
+            try {
+                const card = createTestCard();
+                
+                // Create mock Home Assistant data
+                const mockHass = {
+                    states: {
+                        'sensor.aicleaner_system_status': {
+                            state: 'active',
+                            attributes: {
+                                total_zones: 2,
+                                total_active_tasks: 5,
+                                total_completed_tasks: 10,
+                                global_completion_rate: 0.67,
+                                version: '2.0.0'
+                            }
+                        },
+                        'sensor.aicleaner_kitchen_tasks': {
+                            state: '3',
+                            attributes: {
+                                zone_name: 'Kitchen',
+                                active_tasks: 3,
+                                completed_tasks: 2,
+                                completion_rate: 0.4,
+                                tasks: [
+                                    { id: '1', description: 'Clean counters', priority: 'high' },
+                                    { id: '2', description: 'Organize pantry', priority: 'normal' }
+                                ]
+                            }
+                        }
+                    }
+                };
+                
+                // Set mock data
+                card.hass = mockHass;
+                
+                // Wait for render
+                await new Promise(resolve => setTimeout(resolve, 200));
+                
+                // Test system status processing
+                const hasSystemStatus = card.systemStatus && card.systemStatus.totalZones === 2;
+                addTestResult('System status processing', hasSystemStatus);
+                
+                // Test zone data processing
+                const hasZoneData = card.zones && card.zones.length === 1;
+                addTestResult('Zone data processing', hasZoneData);
+                
+                // Test zone cards rendering
+                const zoneCards = card.shadowRoot.querySelectorAll('.zone-card');
+                addTestResult('Zone cards rendering', zoneCards.length === 1);
+                
+                // Test quick actions
+                const quickActions = card.shadowRoot.querySelector('.quick-actions-panel');
+                addTestResult('Quick actions panel', quickActions !== null);
+                
+            } catch (error) {
+                addTestResult('Mock data test', false, error.message);
+            }
+        }
+        
+        async function testNavigation() {
+            console.log('🧪 Testing navigation...');
+            
+            try {
+                const card = createTestCard();
+                await new Promise(resolve => setTimeout(resolve, 100));
+                
+                // Test navigation buttons exist
+                const navButtons = card.shadowRoot.querySelectorAll('.nav-button');
+                addTestResult('Navigation buttons exist', navButtons.length >= 3);
+                
+                // Test clicking analytics button
+                const analyticsButton = card.shadowRoot.querySelector('[data-view="analytics"]');
+                if (analyticsButton) {
+                    analyticsButton.click();
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    
+                    const isAnalyticsView = card.currentView === 'analytics';
+                    addTestResult('Analytics navigation', isAnalyticsView);
+                } else {
+                    addTestResult('Analytics navigation', false, 'Analytics button not found');
+                }
+                
+                // Test clicking config button
+                const configButton = card.shadowRoot.querySelector('[data-view="config"]');
+                if (configButton) {
+                    configButton.click();
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    
+                    const isConfigView = card.currentView === 'config';
+                    addTestResult('Config navigation', isConfigView);
+                } else {
+                    addTestResult('Config navigation', false, 'Config button not found');
+                }
+                
+            } catch (error) {
+                addTestResult('Navigation test', false, error.message);
+            }
+        }
+        
+        async function testResponsive() {
+            console.log('🧪 Testing responsive design...');
+            
+            try {
+                const card = createTestCard();
+                await new Promise(resolve => setTimeout(resolve, 100));
+                
+                // Test mobile viewport
+                const container = document.getElementById('card-container');
+                container.style.width = '375px';
+                await new Promise(resolve => setTimeout(resolve, 100));
+                
+                const stillVisible = card.shadowRoot.innerHTML.length > 0;
+                addTestResult('Mobile responsive', stillVisible);
+                
+                // Reset width
+                container.style.width = '';
+                
+            } catch (error) {
+                addTestResult('Responsive test', false, error.message);
+            }
+        }
+        
+        async function runAllTests() {
+            console.log('🚀 Running all dashboard tests...');
+            testResults.length = 0; // Clear previous results
+            
+            await testBasicRendering();
+            await testWithMockData();
+            await testNavigation();
+            await testResponsive();
+            
+            const passed = testResults.filter(r => r.passed).length;
+            const total = testResults.length;
+            
+            console.log(`📊 Final Results: ${passed}/${total} tests passed`);
+            
+            if (passed === total) {
+                console.log('🎉 All dashboard tests passed!');
+            } else {
+                console.log('🔴 Some tests failed. Check implementation.');
+            }
+        }
+        
+        // Auto-run basic test on load
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(testBasicRendering, 500);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,20 @@
+{
+    "keep": {
+        "days": true,
+        "amount": 14
+    },
+    "auditLog": "/addons/Aiclean/logs/.41bc6e502ea5ef45050416ce2e64270ff11cc9f2-audit.json",
+    "files": [
+        {
+            "date": 1751083371966,
+            "name": "/addons/Aiclean/logs/mcp-puppeteer-2025-06-27.log",
+            "hash": "48dcef43087f22aa0e57f8abdb578885d8a49ef4a43e3ffd3072617bd40bdc26"
+        },
+        {
+            "date": 1751117913926,
+            "name": "/addons/Aiclean/logs/mcp-puppeteer-2025-06-28.log",
+            "hash": "2891a7b8ac0c50898afebf17c877e1a1a07f1795d7770ed88cf4cf054fc0795e"
+        }
+    ],
+    "hashType": "sha256"
+}

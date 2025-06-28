@@ -136,16 +136,104 @@ cython_debug/
 
 # VSCode
 .vscode/
-# Project-specific files
-DesignDocument.md
-generate_mcp_yaml.py
-install_rooflow_conport.cmd
-pytest.ini
-"Roo - Home Assistant AI Cleaning Assistant Project Plan & Development Documentation.md"
-system_prompt.md
-tests/
-context_portal/
-.roomodes
-context_portal/context.db
-context_portal/conport_vector_data/chroma.sqlite3
-context_portal/conport_vector_data/5ed34b5c-1395-4ec9-9429-ee4207b89ceb/length.bin
+
+# Home Assistant Addon Development
+# =================================
+
+# Environment files (keep .env.mcp for MCP configuration)
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+!.env.mcp
+
+# Home Assistant specific
+secrets.yaml
+known_devices.yaml
+*.db
+*.db-journal
+
+# Logs and temporary files
+logs/*.log
+*.tmp
+*.temp
+
+# Screenshots and media (keep directory structure)
+screenshots/*.png
+screenshots/*.jpg
+screenshots/*.jpeg
+!screenshots/.gitkeep
+
+# Archive directories (keep for reference)
+.archive_*/
+
+# Node.js (for JavaScript utilities)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+yarn.lock
+
+# MCP Server files
+mcp-config.json.backup
+*.mcp.log
+
+# Temporary script files
+analyze_*.sh
+cleanup_*.sh
+organize_*.sh
+review_*.sh
+populate_*.sh
+fix_*.sh
+update_*.sh
+final_*.sh
+*_temp.sh
+
+# Notion API temporary files
+*_info.json
+*_content.json
+*_entries.json
+current_blocks.json
+existing_*.json
+*_entry.json
+corrected_content.json
+new_content.json
+main_content.json
+additional_content.json
+api_doc_fixed.json
+task_entry.json
+endpoint_entry.json
+config_entry.json
+idea_entry.json
+
+# Backup files
+*.bak
+*.backup
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE files
+*.swp
+*.swo
+*~
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Project-specific ignores
+# ========================
+# Remove outdated entries - these files no longer exist or are needed:
+# - DesignDocument.md (now needed)
+# - pytest.ini (now needed)
+# - tests/ (now needed)
+# - Old project files removed during cleanup

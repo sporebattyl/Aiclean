@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug AICleaner Card</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #f5f5f5;
+            --primary-color: #2196F3;
+            --text-primary-color: white;
+            --card-background-color: white;
+            --secondary-background-color: #f8f9fa;
+            --primary-text-color: #212121;
+            --secondary-text-color: #757575;
+            --divider-color: #e0e0e0;
+            --success-color: #4caf50;
+            --warning-color: #ff9800;
+            --error-color: #f44336;
+        }
+        
+        .debug-section {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .debug-log {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+            padding: 10px;
+            font-family: monospace;
+            font-size: 0.9em;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .card-container {
+            border: 2px solid #007bff;
+            border-radius: 8px;
+            padding: 20px;
+            background: white;
+            min-height: 300px;
+        }
+        
+        .step {
+            margin: 10px 0;
+            padding: 10px;
+            background: #e3f2fd;
+            border-left: 4px solid #2196F3;
+        }
+        
+        .error {
+            background: #ffebee;
+            border-left-color: #f44336;
+            color: #c62828;
+        }
+        
+        .success {
+            background: #e8f5e8;
+            border-left-color: #4caf50;
+            color: #2e7d32;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 Debug AICleaner Card</h1>
+    
+    <div class="debug-section">
+        <h2>📋 Debug Steps</h2>
+        <div id="debug-steps"></div>
+    </div>
+    
+    <div class="debug-section">
+        <h2>📝 Console Log</h2>
+        <div class="debug-log" id="console-log"></div>
+    </div>
+    
+    <div class="debug-section">
+        <h2>🎨 Card Preview</h2>
+        <div class="card-container" id="card-container">
+            <!-- Card will be rendered here -->
+        </div>
+    </div>
+
+    <!-- Load the card -->
+    <script src="aicleaner-card.js"></script>
+    
+    <script>
+        const debugSteps = document.getElementById('debug-steps');
+        const consoleLog = document.getElementById('console-log');
+        
+        function logStep(message, type = 'info') {
+            const step = document.createElement('div');
+            step.className = `step ${type}`;
+            step.textContent = `${new Date().toLocaleTimeString()}: ${message}`;
+            debugSteps.appendChild(step);
+            console.log(message);
+        }
+        
+        function logConsole(message) {
+            const log = document.createElement('div');
+            log.textContent = `${new Date().toLocaleTimeString()}: ${message}`;
+            consoleLog.appendChild(log);
+            consoleLog.scrollTop = consoleLog.scrollHeight;
+        }
+        
+        // Override console.log to capture output
+        const originalLog = console.log;
+        const originalError = console.error;
+        
+        console.log = function(...args) {
+            logConsole('LOG: ' + args.join(' '));
+            originalLog.apply(console, args);
+        };
+        
+        console.error = function(...args) {
+            logConsole('ERROR: ' + args.join(' '));
+            originalError.apply(console, args);
+        };
+        
+        async function debugCard() {
+            try {
+                logStep('🚀 Starting debug process...', 'info');
+                
+                // Step 1: Check if custom element is registered
+                logStep('Step 1: Checking custom element registration');
+                const isRegistered = customElements.get('aicleaner-card') !== undefined;
+                logStep(`Custom element registered: ${isRegistered}`, isRegistered ? 'success' : 'error');
+                
+                if (!isRegistered) {
+                    logStep('❌ Cannot proceed - custom element not registered', 'error');
+                    return;
+                }
+                
+                // Step 2: Create element
+                logStep('Step 2: Creating card element');
+                const card = document.createElement('aicleaner-card');
+                logStep(`Element created: ${card instanceof HTMLElement}`, 'success');
+                
+                // Step 3: Check shadow DOM
+                logStep('Step 3: Checking shadow DOM');
+                const hasShadowRoot = card.shadowRoot !== null;
+                logStep(`Shadow DOM exists: ${hasShadowRoot}`, hasShadowRoot ? 'success' : 'error');
+                
+                // Step 4: Set configuration
+                logStep('Step 4: Setting configuration');
+                try {
+                    card.setConfig({
+                        title: 'Debug Test Card',
+                        show_analytics: true,
+                        show_config: true
+                    });
+                    logStep('Configuration set successfully', 'success');
+                } catch (error) {
+                    logStep(`Configuration failed: ${error.message}`, 'error');
+                    return;
+                }
+                
+                // Step 5: Add to DOM
+                logStep('Step 5: Adding card to DOM');
+                const container = document.getElementById('card-container');
+                container.appendChild(card);
+                logStep('Card added to DOM', 'success');
+                
+                // Step 6: Wait for render
+                logStep('Step 6: Waiting for render...');
+                await new Promise(resolve => setTimeout(resolve, 200));
+                
+                // Step 7: Check content
+                logStep('Step 7: Checking rendered content');
+                const hasContent = card.shadowRoot && card.shadowRoot.innerHTML.length > 0;
+                logStep(`Content rendered: ${hasContent}`, hasContent ? 'success' : 'error');
+                
+                if (hasContent) {
+                    const contentLength = card.shadowRoot.innerHTML.length;
+                    logStep(`Content length: ${contentLength} characters`, 'info');
+                    
+                    // Check for specific elements
+                    const hasHeader = card.shadowRoot.querySelector('.header') !== null;
+                    const hasNavigation = card.shadowRoot.querySelector('.navigation') !== null;
+                    const hasContent = card.shadowRoot.querySelector('.content') !== null;
+                    
+                    logStep(`Header found: ${hasHeader}`, hasHeader ? 'success' : 'error');
+                    logStep(`Navigation found: ${hasNavigation}`, hasNavigation ? 'success' : 'error');
+                    logStep(`Content found: ${hasContent}`, hasContent ? 'success' : 'error');
+                }
+                
+                // Step 8: Test with mock data
+                logStep('Step 8: Testing with mock data');
+                try {
+                    const mockHass = {
+                        states: {
+                            'sensor.aicleaner_system_status': {
+                                state: 'active',
+                                attributes: {
+                                    total_zones: 1,
+                                    total_active_tasks: 3,
+                                    version: '2.0.0'
+                                }
+                            }
+                        }
+                    };
+                    
+                    card.hass = mockHass;
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    
+                    logStep(`System status processed: ${card.systemStatus.totalZones === 1}`, 'success');
+                } catch (error) {
+                    logStep(`Mock data failed: ${error.message}`, 'error');
+                }
+                
+                logStep('🎉 Debug process completed!', 'success');
+                
+            } catch (error) {
+                logStep(`💥 Debug failed: ${error.message}`, 'error');
+                console.error('Debug error:', error);
+            }
+        }
+        
+        // Start debug when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            logStep('🔍 Debug page loaded', 'info');
+            setTimeout(debugCard, 500);
+        });
+        
+        // Catch any unhandled errors
+        window.addEventListener('error', (event) => {
+            logStep(`💥 JavaScript Error: ${event.error.message}`, 'error');
+        });
+    </script>
+</body>
+</html>

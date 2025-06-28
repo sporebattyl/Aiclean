@@ -6,6 +6,7 @@ import requests
 import tempfile
 import traceback
 from datetime import datetime, timezone, timedelta
+from pathlib import Path
 from google.generativeai.client import configure
 from google.generativeai.generative_models import GenerativeModel
 import logging
@@ -1638,16 +1639,22 @@ class AICleaner:
         with open(options_path, 'r') as f:
             options = json.load(f)
 
-        supervisor_token = os.environ.get('SUPERVISOR_TOKEN')
-        if not supervisor_token:
-            raise ValueError("SUPERVISOR_TOKEN environment variable not found")
+        # Try to get HA token from environment (Long-Lived Access Token)
+        ha_token = os.environ.get('HA_TOKEN')
 
+        # Fallback to supervisor token if HA_TOKEN not available
+        if not ha_token:
+            ha_token = os.environ.get('SUPERVISOR_TOKEN')
+            if not ha_token:
+                raise ValueError("Neither HA_TOKEN nor SUPERVISOR_TOKEN environment variable found")
+
+        # Use supervisor API URL for Home Assistant addon environment
         return {
             'gemini_api_key': options.get('gemini_api_key'),
             'display_name': options.get('display_name', 'User'),
             'zones': options.get('zones', []),
-            'ha_api_url': 'http://supervisor/core/api',
-            'ha_token': supervisor_token
+            'ha_api_url': 'http://supervisor/core',
+            'ha_token': ha_token
         }
 
     def _load_from_local_env(self):
@@ -1892,13 +1899,76 @@ class AICleaner:
             except Exception as e:
                 logging.error(f"Error syncing HA integrations: {e}")
 
+    def process_service_triggers(self):
+        """Process Home Assistant service triggers"""
+        trigger_dir = Path("/tmp/aicleaner_triggers")
+        if not trigger_dir.exists():
+            return
+
+        trigger_files = list(trigger_dir.glob("trigger_*.json"))
+
+        for trigger_file in trigger_files:
+            try:
+                with open(trigger_file, 'r') as f:
+                    trigger_data = json.load(f)
+
+                action = trigger_data.get('action')
+                data = trigger_data.get('data', {})
+
+                logging.info(f"Processing service trigger: {action} with data: {data}")
+
+                if action == 'run_analysis':
+                    self.handle_service_run_analysis(data)
+                else:
+                    logging.warning(f"Unknown service action: {action}")
+
+                # Remove processed trigger file
+                trigger_file.unlink()
+
+            except Exception as e:
+                logging.error(f"Error processing service trigger {trigger_file}: {e}")
+                # Remove problematic file
+                try:
+                    trigger_file.unlink()
+                except:
+                    pass
+
+    def handle_service_run_analysis(self, data):
+        """Handle run_analysis service call"""
+        try:
+            zone_name = data.get('zone')
+
+            if zone_name:
+                # Run analysis for specific zone
+                zone = next((z for z in self.zones if z.name == zone_name), None)
+                if zone:
+                    logging.info(f"Service call: Running analysis for zone: {zone_name}")
+                    zone.run_analysis_cycle()
+                    self.sync_all_ha_integrations()
+                    logging.info(f"Service call: Analysis completed for zone: {zone_name}")
+                else:
+                    logging.error(f"Service call: Zone not found: {zone_name}")
+            else:
+                # Run analysis for all zones
+                logging.info("Service call: Running analysis for all zones")
+                self.run_single_cycle()
+                logging.info("Service call: Analysis completed for all zones")
+
+        except Exception as e:
+            logging.error(f"Error in service run_analysis: {e}")
+
     def run(self):
         """Main application loop - runs scheduled analysis continuously"""
         logging.info("Starting AICleaner v2.0 main application loop")
 
         try:
             while True:
+                # Run scheduled analysis
                 self.run_scheduled_analysis()
+
+                # Process any service triggers
+                self.process_service_triggers()
+
                 time.sleep(60)  # Check every minute
         except KeyboardInterrupt:
             logging.info("Application stopped by user")

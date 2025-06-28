@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Component-Based TDD Tests</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #f5f5f5;
+            --primary-color: #2196F3;
+            --text-primary-color: white;
+            --card-background-color: white;
+            --secondary-background-color: #f8f9fa;
+            --primary-text-color: #212121;
+            --secondary-text-color: #757575;
+            --divider-color: #e0e0e0;
+            --success-color: #4caf50;
+            --warning-color: #ff9800;
+            --error-color: #f44336;
+        }
+        
+        .component-test {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .test-result {
+            padding: 6px 10px;
+            margin: 3px 0;
+            border-radius: 4px;
+            font-size: 0.85em;
+        }
+        .pass { background: #d4edda; color: #155724; }
+        .fail { background: #f8d7da; color: #721c24; }
+        .pending { background: #fff3cd; color: #856404; }
+        
+        .component-preview {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 10px 0;
+            background: white;
+            min-height: 200px;
+        }
+        
+        .test-controls {
+            margin: 10px 0;
+        }
+        
+        .test-controls button {
+            margin: 3px;
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            background: #2196F3;
+            color: white;
+            cursor: pointer;
+            font-size: 0.85em;
+        }
+        
+        .aaa-section {
+            background: #f8f9fa;
+            border-left: 4px solid #2196F3;
+            padding: 10px;
+            margin: 10px 0;
+            font-family: monospace;
+            font-size: 0.8em;
+        }
+        
+        .arrange { border-left-color: #ff9800; }
+        .act { border-left-color: #2196F3; }
+        .assert { border-left-color: #4caf50; }
+    </style>
+</head>
+<body>
+    <h1>🧩 Component-Based TDD Tests</h1>
+    <p>Testing individual components following AAA (Arrange-Act-Assert) pattern</p>
+    
+    <!-- Header Component Tests -->
+    <div class="component-test">
+        <h2>🏠 Header Component</h2>
+        <div class="aaa-section arrange">
+            <strong>ARRANGE:</strong> Create card with system status data
+        </div>
+        <div class="aaa-section act">
+            <strong>ACT:</strong> Render header component
+        </div>
+        <div class="aaa-section assert">
+            <strong>ASSERT:</strong> Header displays title, status, and last analysis
+        </div>
+        
+        <div id="header-tests">
+            <div class="test-result pending">⏳ Ready to test...</div>
+        </div>
+        <div class="test-controls">
+            <button onclick="testHeaderComponent()">Test Header</button>
+        </div>
+        <div class="component-preview" id="header-preview"></div>
+    </div>
+    
+    <!-- Navigation Component Tests -->
+    <div class="component-test">
+        <h2>🧭 Navigation Component</h2>
+        <div class="aaa-section arrange">
+            <strong>ARRANGE:</strong> Create card with navigation configuration
+        </div>
+        <div class="aaa-section act">
+            <strong>ACT:</strong> Render navigation and click buttons
+        </div>
+        <div class="aaa-section assert">
+            <strong>ASSERT:</strong> Navigation switches views correctly
+        </div>
+        
+        <div id="navigation-tests">
+            <div class="test-result pending">⏳ Ready to test...</div>
+        </div>
+        <div class="test-controls">
+            <button onclick="testNavigationComponent()">Test Navigation</button>
+        </div>
+        <div class="component-preview" id="navigation-preview"></div>
+    </div>
+    
+    <!-- Zone Card Component Tests -->
+    <div class="component-test">
+        <h2>🏠 Zone Card Component</h2>
+        <div class="aaa-section arrange">
+            <strong>ARRANGE:</strong> Create zone data with tasks and metrics
+        </div>
+        <div class="aaa-section act">
+            <strong>ACT:</strong> Render zone card component
+        </div>
+        <div class="aaa-section assert">
+            <strong>ASSERT:</strong> Zone card shows name, tasks, progress, and actions
+        </div>
+        
+        <div id="zone-card-tests">
+            <div class="test-result pending">⏳ Ready to test...</div>
+        </div>
+        <div class="test-controls">
+            <button onclick="testZoneCardComponent()">Test Zone Card</button>
+        </div>
+        <div class="component-preview" id="zone-card-preview"></div>
+    </div>
+    
+    <!-- Quick Actions Component Tests -->
+    <div class="component-test">
+        <h2>⚡ Quick Actions Component</h2>
+        <div class="aaa-section arrange">
+            <strong>ARRANGE:</strong> Create card with system status and zones
+        </div>
+        <div class="aaa-section act">
+            <strong>ACT:</strong> Render quick actions and test button clicks
+        </div>
+        <div class="aaa-section assert">
+            <strong>ASSERT:</strong> Quick actions trigger correct service calls
+        </div>
+        
+        <div id="quick-actions-tests">
+            <div class="test-result pending">⏳ Ready to test...</div>
+        </div>
+        <div class="test-controls">
+            <button onclick="testQuickActionsComponent()">Test Quick Actions</button>
+        </div>
+        <div class="component-preview" id="quick-actions-preview"></div>
+    </div>
+    
+    <!-- Task Item Component Tests -->
+    <div class="component-test">
+        <h2>✅ Task Item Component</h2>
+        <div class="aaa-section arrange">
+            <strong>ARRANGE:</strong> Create task data with different priorities
+        </div>
+        <div class="aaa-section act">
+            <strong>ACT:</strong> Render task items and test action buttons
+        </div>
+        <div class="aaa-section assert">
+            <strong>ASSERT:</strong> Task items show description, priority, and working actions
+        </div>
+        
+        <div id="task-item-tests">
+            <div class="test-result pending">⏳ Ready to test...</div>
+        </div>
+        <div class="test-controls">
+            <button onclick="testTaskItemComponent()">Test Task Items</button>
+        </div>
+        <div class="component-preview" id="task-item-preview"></div>
+    </div>
+    
+    <!-- Configuration Panel Component Tests -->
+    <div class="component-test">
+        <h2>⚙️ Configuration Panel Component</h2>
+        <div class="aaa-section arrange">
+            <strong>ARRANGE:</strong> Create card in config view with personality options
+        </div>
+        <div class="aaa-section act">
+            <strong>ACT:</strong> Render config panel and test personality selection
+        </div>
+        <div class="aaa-section assert">
+            <strong>ASSERT:</strong> Config panel shows personalities and handles selection
+        </div>
+        
+        <div id="config-panel-tests">
+            <div class="test-result pending">⏳ Ready to test...</div>
+        </div>
+        <div class="test-controls">
+            <button onclick="testConfigPanelComponent()">Test Config Panel</button>
+        </div>
+        <div class="component-preview" id="config-panel-preview"></div>
+    </div>
+    
+    <!-- Analytics Dashboard Component Tests -->
+    <div class="component-test">
+        <h2>📊 Analytics Dashboard Component</h2>
+        <div class="aaa-section arrange">
+            <strong>ARRANGE:</strong> Create card with historical data for charts
+        </div>
+        <div class="aaa-section act">
+            <strong>ACT:</strong> Render analytics view and initialize charts
+        </div>
+        <div class="aaa-section assert">
+            <strong>ASSERT:</strong> Analytics shows charts and system insights
+        </div>
+        
+        <div id="analytics-tests">
+            <div class="test-result pending">⏳ Ready to test...</div>
+        </div>
+        <div class="test-controls">
+            <button onclick="testAnalyticsComponent()">Test Analytics</button>
+        </div>
+        <div class="component-preview" id="analytics-preview"></div>
+    </div>
+    
+    <!-- Responsive Design Tests -->
+    <div class="component-test">
+        <h2>📱 Responsive Design Tests</h2>
+        <div class="aaa-section arrange">
+            <strong>ARRANGE:</strong> Create card with full data set
+        </div>
+        <div class="aaa-section act">
+            <strong>ACT:</strong> Test different viewport sizes
+        </div>
+        <div class="aaa-section assert">
+            <strong>ASSERT:</strong> Layout adapts correctly to mobile/tablet/desktop
+        </div>
+        
+        <div id="responsive-tests">
+            <div class="test-result pending">⏳ Ready to test...</div>
+        </div>
+        <div class="test-controls">
+            <button onclick="testResponsiveDesign()">Test Responsive</button>
+            <button onclick="setMobileView()">Mobile View</button>
+            <button onclick="setTabletView()">Tablet View</button>
+            <button onclick="setDesktopView()">Desktop View</button>
+        </div>
+        <div class="component-preview" id="responsive-preview"></div>
+    </div>
+
+    <!-- Load the card -->
+    <script src="aicleaner-card.js"></script>
+    
+    <script>
+        // Test framework following AAA pattern
+        class ComponentTestFramework {
+            constructor() {
+                this.mockHass = {
+                    states: {
+                        'sensor.aicleaner_system_status': {
+                            state: 'active',
+                            attributes: {
+                                total_zones: 3,
+                                total_active_tasks: 8,
+                                total_completed_tasks: 15,
+                                global_completion_rate: 0.65,
+                                average_efficiency_score: 0.78,
+                                last_analysis: new Date(Date.now() - 1800000).toISOString(), // 30 min ago
+                                version: '2.0.0'
+                            }
+                        },
+                        'sensor.aicleaner_kitchen_tasks': {
+                            state: '3',
+                            attributes: {
+                                zone_name: 'Kitchen',
+                                active_tasks: 3,
+                                completed_tasks: 5,
+                                completion_rate: 0.625,
+                                efficiency_score: 0.8,
+                                last_analysis: new Date(Date.now() - 900000).toISOString(), // 15 min ago
+                                tasks: [
+                                    { id: '1', description: 'Clean countertops', priority: 'high', created_at: new Date().toISOString() },
+                                    { id: '2', description: 'Organize pantry', priority: 'normal', created_at: new Date().toISOString() },
+                                    { id: '3', description: 'Wipe appliances', priority: 'low', created_at: new Date().toISOString() }
+                                ]
+                            }
+                        },
+                        'sensor.aicleaner_living_room_tasks': {
+                            state: '2',
+                            attributes: {
+                                zone_name: 'Living Room',
+                                active_tasks: 2,
+                                completed_tasks: 7,
+                                completion_rate: 0.78,
+                                efficiency_score: 0.75,
+                                tasks: [
+                                    { id: '4', description: 'Vacuum carpet', priority: 'high', created_at: new Date().toISOString() },
+                                    { id: '5', description: 'Dust furniture', priority: 'normal', created_at: new Date().toISOString() }
+                                ]
+                            }
+                        },
+                        'sensor.aicleaner_bedroom_tasks': {
+                            state: '3',
+                            attributes: {
+                                zone_name: 'Bedroom',
+                                active_tasks: 3,
+                                completed_tasks: 3,
+                                completion_rate: 0.5,
+                                efficiency_score: 0.85,
+                                tasks: [
+                                    { id: '6', description: 'Make bed', priority: 'normal', created_at: new Date().toISOString() },
+                                    { id: '7', description: 'Organize closet', priority: 'low', created_at: new Date().toISOString() },
+                                    { id: '8', description: 'Clean windows', priority: 'low', created_at: new Date().toISOString() }
+                                ]
+                            }
+                        }
+                    },
+                    callService: (domain, service, data) => {
+                        console.log(`Mock service call: ${domain}.${service}`, data);
+                        return Promise.resolve();
+                    }
+                };
+            }
+            
+            displayResults(containerId, results) {
+                const container = document.getElementById(containerId);
+                const passed = results.filter(r => r.passed).length;
+                const total = results.length;
+                
+                container.innerHTML = `
+                    <div class="test-result ${passed === total ? 'pass' : 'fail'}">
+                        Component Tests: ${passed}/${total} passed
+                    </div>
+                    ${results.map(result => `
+                        <div class="test-result ${result.passed ? 'pass' : 'fail'}">
+                            ${result.passed ? '✅' : '❌'} ${result.name}
+                            ${result.details ? `<br><small>${result.details}</small>` : ''}
+                        </div>
+                    `).join('')}
+                `;
+            }
+            
+            createTestCard(previewId) {
+                const card = document.createElement('aicleaner-card');
+                card.setConfig({
+                    title: 'Component Test Card',
+                    show_analytics: true,
+                    show_config: true
+                });
+                
+                const preview = document.getElementById(previewId);
+                preview.innerHTML = '';
+                preview.appendChild(card);
+                
+                return card;
+            }
+            
+            async waitForRender() {
+                return new Promise(resolve => setTimeout(resolve, 100));
+            }
+        }
+        
+        const testFramework = new ComponentTestFramework();
+        
+        // Header Component Tests (AAA Pattern)
+        async function testHeaderComponent() {
+            const results = [];
+
+            try {
+                // ARRANGE: Create card with system status
+                const card = testFramework.createTestCard('header-preview');
+                card.hass = testFramework.mockHass;
+                await testFramework.waitForRender();
+
+                // ACT: Render header component
+                const header = card.shadowRoot.querySelector('.header');
+
+                // ASSERT: Header elements exist and display correct data
+                results.push({ name: 'Header element exists', passed: header !== null });
+
+                const title = card.shadowRoot.querySelector('.title');
+                results.push({ name: 'Title displays', passed: title && title.textContent.includes('Component Test Card') });
+
+                const systemStatus = card.shadowRoot.querySelector('.system-status');
+                results.push({ name: 'System status displays', passed: systemStatus !== null });
+
+                const statusText = card.shadowRoot.textContent;
+                results.push({ name: 'Active status shown', passed: statusText.includes('System Active') || statusText.includes('active') });
+
+                const lastAnalysis = card.shadowRoot.textContent;
+                results.push({ name: 'Last analysis time shown', passed: lastAnalysis.includes('ago') || lastAnalysis.includes('Never') });
+
+            } catch (error) {
+                results.push({ name: 'Header component test', passed: false, details: error.message });
+            }
+
+            testFramework.displayResults('header-tests', results);
+        }
+
+        // Navigation Component Tests (AAA Pattern)
+        async function testNavigationComponent() {
+            const results = [];
+
+            try {
+                // ARRANGE: Create card with navigation enabled
+                const card = testFramework.createTestCard('navigation-preview');
+                await testFramework.waitForRender();
+
+                // ACT: Check navigation elements
+                const navigation = card.shadowRoot.querySelector('.navigation');
+                results.push({ name: 'Navigation element exists', passed: navigation !== null });
+
+                const navButtons = card.shadowRoot.querySelectorAll('.nav-button');
+                results.push({ name: 'Navigation buttons exist', passed: navButtons.length >= 3 });
+
+                // ACT: Test dashboard navigation
+                const dashboardBtn = card.shadowRoot.querySelector('[data-view="dashboard"]');
+                if (dashboardBtn) {
+                    dashboardBtn.click();
+                    await testFramework.waitForRender();
+                    results.push({ name: 'Dashboard navigation works', passed: card.currentView === 'dashboard' });
+                }
+
+                // ACT: Test analytics navigation
+                const analyticsBtn = card.shadowRoot.querySelector('[data-view="analytics"]');
+                if (analyticsBtn) {
+                    analyticsBtn.click();
+                    await testFramework.waitForRender();
+                    results.push({ name: 'Analytics navigation works', passed: card.currentView === 'analytics' });
+                }
+
+                // ACT: Test config navigation
+                const configBtn = card.shadowRoot.querySelector('[data-view="config"]');
+                if (configBtn) {
+                    configBtn.click();
+                    await testFramework.waitForRender();
+                    results.push({ name: 'Config navigation works', passed: card.currentView === 'config' });
+                }
+
+            } catch (error) {
+                results.push({ name: 'Navigation component test', passed: false, details: error.message });
+            }
+
+            testFramework.displayResults('navigation-tests', results);
+        }
+
+        // Zone Card Component Tests (AAA Pattern)
+        async function testZoneCardComponent() {
+            const results = [];
+
+            try {
+                // ARRANGE: Create card with zone data
+                const card = testFramework.createTestCard('zone-card-preview');
+                card.hass = testFramework.mockHass;
+                card.currentView = 'dashboard';
+                await testFramework.waitForRender();
+
+                // ACT: Check zone cards rendering
+                const zoneCards = card.shadowRoot.querySelectorAll('.zone-card');
+                results.push({ name: 'Zone cards render', passed: zoneCards.length >= 3 });
+
+                // ASSERT: Zone card content
+                if (zoneCards.length > 0) {
+                    const firstCard = zoneCards[0];
+
+                    const zoneName = firstCard.querySelector('.zone-name');
+                    results.push({ name: 'Zone name displays', passed: zoneName !== null });
+
+                    const taskCount = firstCard.textContent;
+                    results.push({ name: 'Task count displays', passed: taskCount.includes('tasks') || taskCount.includes('3') });
+
+                    const progressBar = firstCard.querySelector('.progress-bar, .zone-progress');
+                    results.push({ name: 'Progress indicator exists', passed: progressBar !== null });
+
+                    const actionButton = firstCard.querySelector('.action-button, [data-action]');
+                    results.push({ name: 'Action button exists', passed: actionButton !== null });
+                }
+
+            } catch (error) {
+                results.push({ name: 'Zone card component test', passed: false, details: error.message });
+            }
+
+            testFramework.displayResults('zone-card-tests', results);
+        }
+
+        // Quick Actions Component Tests (AAA Pattern)
+        async function testQuickActionsComponent() {
+            const results = [];
+
+            try {
+                // ARRANGE: Create card with system data
+                const card = testFramework.createTestCard('quick-actions-preview');
+                card.hass = testFramework.mockHass;
+                card.currentView = 'dashboard';
+                await testFramework.waitForRender();
+
+                // ACT: Check quick actions panel
+                const quickActions = card.shadowRoot.querySelector('.quick-actions-panel');
+                results.push({ name: 'Quick actions panel exists', passed: quickActions !== null });
+
+                const actionButtons = card.shadowRoot.querySelectorAll('.quick-action-btn');
+                results.push({ name: 'Quick action buttons exist', passed: actionButtons.length >= 3 });
+
+                // ASSERT: Test button functionality
+                let serviceCallMade = false;
+                card._hass.callService = () => {
+                    serviceCallMade = true;
+                    return Promise.resolve();
+                };
+
+                const analyzeAllBtn = card.shadowRoot.querySelector('[data-action="analyze-all"]');
+                if (analyzeAllBtn) {
+                    analyzeAllBtn.click();
+                    results.push({ name: 'Analyze all button works', passed: serviceCallMade });
+                }
+
+            } catch (error) {
+                results.push({ name: 'Quick actions test', passed: false, details: error.message });
+            }
+
+            testFramework.displayResults('quick-actions-tests', results);
+        }
+
+        // Task Item Component Tests (AAA Pattern)
+        async function testTaskItemComponent() {
+            const results = [];
+
+            try {
+                // ARRANGE: Create card with task data and navigate to zone view
+                const card = testFramework.createTestCard('task-item-preview');
+                card.hass = testFramework.mockHass;
+                card.selectedZone = 'kitchen';
+                card.currentView = 'zone';
+                await testFramework.waitForRender();
+
+                // ACT: Check task items
+                const taskItems = card.shadowRoot.querySelectorAll('.task-item');
+                results.push({ name: 'Task items render', passed: taskItems.length >= 1 });
+
+                if (taskItems.length > 0) {
+                    const firstTask = taskItems[0];
+
+                    // ASSERT: Task content
+                    const taskDescription = firstTask.querySelector('.task-description');
+                    results.push({ name: 'Task description displays', passed: taskDescription !== null });
+
+                    const taskPriority = firstTask.querySelector('.task-priority');
+                    results.push({ name: 'Task priority displays', passed: taskPriority !== null });
+
+                    const completeButton = firstTask.querySelector('.task-action-btn.complete');
+                    results.push({ name: 'Complete button exists', passed: completeButton !== null });
+
+                    const dismissButton = firstTask.querySelector('.task-action-btn.dismiss');
+                    results.push({ name: 'Dismiss button exists', passed: dismissButton !== null });
+                }
+
+            } catch (error) {
+                results.push({ name: 'Task item test', passed: false, details: error.message });
+            }
+
+            testFramework.displayResults('task-item-tests', results);
+        }
+
+        // Configuration Panel Component Tests (AAA Pattern)
+        async function testConfigPanelComponent() {
+            const results = [];
+
+            try {
+                // ARRANGE: Create card in config view
+                const card = testFramework.createTestCard('config-panel-preview');
+                card.currentView = 'config';
+                await testFramework.waitForRender();
+
+                // ACT: Check config panel elements
+                const configSections = card.shadowRoot.querySelectorAll('.config-section');
+                results.push({ name: 'Config sections exist', passed: configSections.length >= 3 });
+
+                const personalityCards = card.shadowRoot.querySelectorAll('.personality-card');
+                results.push({ name: 'Personality cards exist', passed: personalityCards.length >= 6 });
+
+                // ASSERT: Test personality selection
+                if (personalityCards.length > 0) {
+                    const defaultPersonality = card.shadowRoot.querySelector('[data-personality="default"]');
+                    results.push({ name: 'Default personality exists', passed: defaultPersonality !== null });
+
+                    const snarkyPersonality = card.shadowRoot.querySelector('[data-personality="snarky"]');
+                    results.push({ name: 'Snarky personality exists', passed: snarkyPersonality !== null });
+                }
+
+                const ignoreRules = card.shadowRoot.querySelector('.ignore-rules-list, .add-rule-form');
+                results.push({ name: 'Ignore rules section exists', passed: ignoreRules !== null });
+
+            } catch (error) {
+                results.push({ name: 'Config panel test', passed: false, details: error.message });
+            }
+
+            testFramework.displayResults('config-panel-tests', results);
+        }
+
+        // Analytics Dashboard Component Tests (AAA Pattern)
+        async function testAnalyticsComponent() {
+            const results = [];
+
+            try {
+                // ARRANGE: Create card in analytics view
+                const card = testFramework.createTestCard('analytics-preview');
+                card.hass = testFramework.mockHass;
+                card.currentView = 'analytics';
+                await testFramework.waitForRender();
+
+                // ACT: Check analytics elements
+                const analyticsGrid = card.shadowRoot.querySelector('.analytics-grid');
+                results.push({ name: 'Analytics grid exists', passed: analyticsGrid !== null });
+
+                const analyticsSections = card.shadowRoot.querySelectorAll('.analytics-section');
+                results.push({ name: 'Analytics sections exist', passed: analyticsSections.length >= 3 });
+
+                const chartContainers = card.shadowRoot.querySelectorAll('.chart-container');
+                results.push({ name: 'Chart containers exist', passed: chartContainers.length >= 2 });
+
+                const insightsPanel = card.shadowRoot.querySelector('.insights-grid');
+                results.push({ name: 'System insights panel exists', passed: insightsPanel !== null });
+
+                // Wait a bit longer for charts to potentially load
+                await new Promise(resolve => setTimeout(resolve, 500));
+
+                const chartCanvases = card.shadowRoot.querySelectorAll('canvas');
+                results.push({ name: 'Chart canvases exist', passed: chartCanvases.length >= 2 });
+
+            } catch (error) {
+                results.push({ name: 'Analytics test', passed: false, details: error.message });
+            }
+
+            testFramework.displayResults('analytics-tests', results);
+        }
+
+        // Responsive Design Tests (AAA Pattern)
+        async function testResponsiveDesign() {
+            const results = [];
+
+            try {
+                // ARRANGE: Create card with full data
+                const card = testFramework.createTestCard('responsive-preview');
+                card.hass = testFramework.mockHass;
+                await testFramework.waitForRender();
+
+                // ACT & ASSERT: Test different viewport sizes
+                const preview = document.getElementById('responsive-preview');
+
+                // Mobile test
+                preview.style.width = '375px';
+                await testFramework.waitForRender();
+                const mobileVisible = card.shadowRoot.innerHTML.length > 0;
+                results.push({ name: 'Mobile view renders', passed: mobileVisible });
+
+                // Tablet test
+                preview.style.width = '768px';
+                await testFramework.waitForRender();
+                const tabletVisible = card.shadowRoot.innerHTML.length > 0;
+                results.push({ name: 'Tablet view renders', passed: tabletVisible });
+
+                // Desktop test
+                preview.style.width = '100%';
+                await testFramework.waitForRender();
+                const desktopVisible = card.shadowRoot.innerHTML.length > 0;
+                results.push({ name: 'Desktop view renders', passed: desktopVisible });
+
+                // Test grid responsiveness
+                const zoneGrid = card.shadowRoot.querySelector('.zone-grid');
+                results.push({ name: 'Zone grid exists for responsive layout', passed: zoneGrid !== null });
+
+            } catch (error) {
+                results.push({ name: 'Responsive design test', passed: false, details: error.message });
+            }
+
+            testFramework.displayResults('responsive-tests', results);
+        }
+
+        // Viewport control functions
+        function setMobileView() {
+            document.getElementById('responsive-preview').style.width = '375px';
+        }
+
+        function setTabletView() {
+            document.getElementById('responsive-preview').style.width = '768px';
+        }
+
+        function setDesktopView() {
+            document.getElementById('responsive-preview').style.width = '100%';
+        }
+
+        console.log('🧩 Component test framework initialized');
+    </script>
+</body>
+</html>

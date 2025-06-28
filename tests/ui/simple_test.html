@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple AICleaner Card Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #f5f5f5;
+        }
+        .test-result {
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 4px;
+        }
+        .pass { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .fail { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .pending { background: #fff3cd; color: #856404; border: 1px solid #ffeaa7; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Simple AICleaner Card Test</h1>
+    <div id="test-results">
+        <div class="test-result pending">⏳ Running tests...</div>
+    </div>
+    
+    <h2>📊 Test Output</h2>
+    <div id="test-output"></div>
+    
+    <h2>🎨 Card Preview</h2>
+    <div id="card-container"></div>
+
+    <!-- Load the card -->
+    <script src="/aicleaner-card.js"></script>
+    
+    <script>
+        // Simple TDD test following AAA pattern
+        async function runSimpleTests() {
+            const results = [];
+            const output = document.getElementById('test-output');
+            
+            function log(message) {
+                output.innerHTML += `<div>${message}</div>`;
+                console.log(message);
+            }
+            
+            function assert(condition, message) {
+                if (condition) {
+                    results.push({ name: message, status: 'pass' });
+                    log(`✅ PASS: ${message}`);
+                } else {
+                    results.push({ name: message, status: 'fail' });
+                    log(`❌ FAIL: ${message}`);
+                }
+            }
+            
+            log('🔴 RED PHASE: Testing current implementation...');
+            
+            // Test 1: Card Registration (AAA Pattern)
+            log('\n--- Test 1: Card Registration ---');
+            // Arrange
+            const expectedTagName = 'aicleaner-card';
+            
+            // Act
+            const isRegistered = customElements.get(expectedTagName) !== undefined;
+            
+            // Assert
+            assert(isRegistered, 'AICleaner card should be registered as custom element');
+            
+            // Test 2: Card Creation (AAA Pattern)
+            log('\n--- Test 2: Card Creation ---');
+            // Arrange
+            let card = null;
+            let creationSuccessful = false;
+            
+            // Act
+            try {
+                card = document.createElement('aicleaner-card');
+                creationSuccessful = card instanceof HTMLElement;
+            } catch (error) {
+                log(`Error creating card: ${error.message}`);
+            }
+            
+            // Assert
+            assert(creationSuccessful, 'Should be able to create AICleaner card element');
+            
+            // Test 3: Configuration (AAA Pattern)
+            log('\n--- Test 3: Configuration ---');
+            if (card) {
+                // Arrange
+                const testConfig = { title: 'Test Card', theme: 'dark' };
+                let configSuccessful = false;
+                
+                // Act
+                try {
+                    card.setConfig(testConfig);
+                    configSuccessful = card._config && card._config.title === 'Test Card';
+                } catch (error) {
+                    log(`Error setting config: ${error.message}`);
+                }
+                
+                // Assert
+                assert(configSuccessful, 'Should accept and store configuration');
+            }
+            
+            // Test 4: Rendering (AAA Pattern)
+            log('\n--- Test 4: Basic Rendering ---');
+            if (card) {
+                // Arrange
+                const container = document.getElementById('card-container');
+                let renderSuccessful = false;
+                
+                // Act
+                try {
+                    container.appendChild(card);
+                    // Give it a moment to render
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    renderSuccessful = card.shadowRoot && card.shadowRoot.innerHTML.length > 0;
+                } catch (error) {
+                    log(`Error rendering card: ${error.message}`);
+                }
+                
+                // Assert
+                assert(renderSuccessful, 'Should render content in shadow DOM');
+            }
+            
+            // Test 5: Mock Data Processing (AAA Pattern)
+            log('\n--- Test 5: Mock Data Processing ---');
+            if (card) {
+                // Arrange
+                const mockHass = {
+                    states: {
+                        'sensor.aicleaner_system_status': {
+                            state: 'active',
+                            attributes: { total_zones: 2, total_active_tasks: 5 }
+                        }
+                    }
+                };
+                let dataProcessingSuccessful = false;
+                
+                // Act
+                try {
+                    card.hass = mockHass;
+                    dataProcessingSuccessful = card.systemStatus && 
+                                             card.systemStatus.totalZones === 2;
+                } catch (error) {
+                    log(`Error processing mock data: ${error.message}`);
+                }
+                
+                // Assert
+                assert(dataProcessingSuccessful, 'Should process Home Assistant data correctly');
+            }
+            
+            // Display final results
+            const passed = results.filter(r => r.status === 'pass').length;
+            const total = results.length;
+            
+            log(`\n📊 Final Results: ${passed}/${total} tests passed`);
+            
+            const resultsContainer = document.getElementById('test-results');
+            resultsContainer.innerHTML = `
+                <div class="test-result ${passed === total ? 'pass' : 'fail'}">
+                    ${passed === total ? '✅' : '❌'} Tests: ${passed}/${total} passed
+                </div>
+                ${results.map(result => `
+                    <div class="test-result ${result.status}">
+                        ${result.status === 'pass' ? '✅' : '❌'} ${result.name}
+                    </div>
+                `).join('')}
+            `;
+            
+            if (passed === total) {
+                log('\n🎉 All tests passed! Ready for GREEN phase.');
+            } else {
+                log('\n🔴 Some tests failed. This is expected in RED phase.');
+                log('Next: Implement missing functionality to make tests pass.');
+            }
+        }
+        
+        // Run tests when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            runSimpleTests();
+        });
+    </script>
+</body>
+</html>

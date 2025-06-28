@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comprehensive AICleaner Card Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #f5f5f5;
+            --primary-color: #2196F3;
+            --text-primary-color: white;
+            --card-background-color: white;
+            --secondary-background-color: #f8f9fa;
+            --primary-text-color: #212121;
+            --secondary-text-color: #757575;
+            --divider-color: #e0e0e0;
+            --success-color: #4caf50;
+            --warning-color: #ff9800;
+            --error-color: #f44336;
+        }
+        
+        .test-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .test-section {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .test-result {
+            padding: 8px 12px;
+            margin: 5px 0;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+        .pass { background: #d4edda; color: #155724; }
+        .fail { background: #f8d7da; color: #721c24; }
+        .pending { background: #fff3cd; color: #856404; }
+        
+        .card-container {
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            background: white;
+            min-height: 400px;
+            grid-column: span 2;
+        }
+        
+        .controls {
+            margin: 10px 0;
+        }
+        
+        .controls button {
+            margin: 5px;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            background: #2196F3;
+            color: white;
+            cursor: pointer;
+            font-size: 0.9em;
+        }
+        
+        .controls button:hover {
+            background: #1976D2;
+        }
+        
+        .mock-data {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+            padding: 10px;
+            font-family: monospace;
+            font-size: 0.8em;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Comprehensive AICleaner Card Test Suite</h1>
+    
+    <div class="test-grid">
+        <div class="test-section">
+            <h3>🔧 Core Component Tests</h3>
+            <div id="core-tests">
+                <div class="test-result pending">⏳ Waiting to run...</div>
+            </div>
+            <div class="controls">
+                <button onclick="runCoreTests()">Run Core Tests</button>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h3>🎨 UI Component Tests</h3>
+            <div id="ui-tests">
+                <div class="test-result pending">⏳ Waiting to run...</div>
+            </div>
+            <div class="controls">
+                <button onclick="runUITests()">Run UI Tests</button>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h3>🔄 Data Processing Tests</h3>
+            <div id="data-tests">
+                <div class="test-result pending">⏳ Waiting to run...</div>
+            </div>
+            <div class="controls">
+                <button onclick="runDataTests()">Run Data Tests</button>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h3>🎯 Interaction Tests</h3>
+            <div id="interaction-tests">
+                <div class="test-result pending">⏳ Waiting to run...</div>
+            </div>
+            <div class="controls">
+                <button onclick="runInteractionTests()">Run Interaction Tests</button>
+            </div>
+        </div>
+        
+        <div class="card-container">
+            <h3>🎨 Live Card Preview</h3>
+            <div class="controls">
+                <button onclick="showDashboard()">Dashboard</button>
+                <button onclick="showAnalytics()">Analytics</button>
+                <button onclick="showConfig()">Config</button>
+                <button onclick="addMockData()">Add Mock Data</button>
+                <button onclick="runAllTests()">🚀 Run All Tests</button>
+            </div>
+            <div id="card-preview"></div>
+        </div>
+    </div>
+    
+    <div class="test-section" style="margin-top: 20px;">
+        <h3>📊 Mock Data</h3>
+        <div class="mock-data" id="mock-data-display"></div>
+    </div>
+
+    <!-- Load the card -->
+    <script src="aicleaner-card.js"></script>
+    
+    <script>
+        let testCard = null;
+        const mockData = {
+            states: {
+                'sensor.aicleaner_system_status': {
+                    state: 'active',
+                    attributes: {
+                        total_zones: 2,
+                        total_active_tasks: 5,
+                        total_completed_tasks: 12,
+                        global_completion_rate: 0.71,
+                        version: '2.0.0'
+                    }
+                },
+                'sensor.aicleaner_kitchen_tasks': {
+                    state: '3',
+                    attributes: {
+                        zone_name: 'Kitchen',
+                        active_tasks: 3,
+                        completed_tasks: 5,
+                        completion_rate: 0.625,
+                        tasks: [
+                            { id: '1', description: 'Clean countertops', priority: 'high' },
+                            { id: '2', description: 'Organize pantry', priority: 'normal' },
+                            { id: '3', description: 'Wipe appliances', priority: 'low' }
+                        ]
+                    }
+                },
+                'sensor.aicleaner_living_room_tasks': {
+                    state: '2',
+                    attributes: {
+                        zone_name: 'Living Room',
+                        active_tasks: 2,
+                        completed_tasks: 7,
+                        completion_rate: 0.78,
+                        tasks: [
+                            { id: '4', description: 'Vacuum carpet', priority: 'high' },
+                            { id: '5', description: 'Dust furniture', priority: 'normal' }
+                        ]
+                    }
+                }
+            }
+        };
+        
+        function displayResults(containerId, results) {
+            const container = document.getElementById(containerId);
+            const passed = results.filter(r => r.passed).length;
+            const total = results.length;
+            
+            container.innerHTML = `
+                <div class="test-result ${passed === total ? 'pass' : 'fail'}">
+                    ${passed}/${total} tests passed
+                </div>
+                ${results.map(result => `
+                    <div class="test-result ${result.passed ? 'pass' : 'fail'}">
+                        ${result.passed ? '✅' : '❌'} ${result.name}
+                        ${result.details ? `<br><small>${result.details}</small>` : ''}
+                    </div>
+                `).join('')}
+            `;
+        }
+        
+        function createTestCard() {
+            if (testCard) {
+                testCard.remove();
+            }
+            
+            testCard = document.createElement('aicleaner-card');
+            testCard.setConfig({
+                title: 'Test AICleaner Card',
+                show_analytics: true,
+                show_config: true
+            });
+            
+            const preview = document.getElementById('card-preview');
+            preview.innerHTML = '';
+            preview.appendChild(testCard);
+            
+            return testCard;
+        }
+        
+        async function runCoreTests() {
+            const results = [];
+            
+            try {
+                // Test 1: Element registration
+                const isRegistered = customElements.get('aicleaner-card') !== undefined;
+                results.push({ name: 'Custom element registration', passed: isRegistered });
+                
+                // Test 2: Element creation
+                const card = document.createElement('aicleaner-card');
+                const created = card instanceof HTMLElement;
+                results.push({ name: 'Element creation', passed: created });
+                
+                // Test 3: Shadow DOM
+                const hasShadowRoot = card.shadowRoot !== null;
+                results.push({ name: 'Shadow DOM creation', passed: hasShadowRoot });
+                
+                // Test 4: Configuration
+                card.setConfig({ title: 'Test' });
+                const configured = card._config && card._config.title === 'Test';
+                results.push({ name: 'Configuration handling', passed: configured });
+                
+                // Test 5: Default data structures
+                const hasDefaults = card.zones && card.systemStatus;
+                results.push({ name: 'Default data initialization', passed: hasDefaults });
+                
+            } catch (error) {
+                results.push({ name: 'Core tests', passed: false, details: error.message });
+            }
+            
+            displayResults('core-tests', results);
+        }
+        
+        async function runUITests() {
+            const results = [];
+            
+            try {
+                const card = createTestCard();
+                await new Promise(resolve => setTimeout(resolve, 100));
+                
+                // Test 1: Basic rendering
+                const hasContent = card.shadowRoot && card.shadowRoot.innerHTML.length > 0;
+                results.push({ name: 'Basic rendering', passed: hasContent });
+                
+                // Test 2: Header rendering
+                const hasHeader = card.shadowRoot.querySelector('.header') !== null;
+                results.push({ name: 'Header component', passed: hasHeader });
+                
+                // Test 3: Navigation rendering
+                const hasNavigation = card.shadowRoot.querySelector('.navigation') !== null;
+                results.push({ name: 'Navigation component', passed: hasNavigation });
+                
+                // Test 4: Content area
+                const hasContentArea = card.shadowRoot.querySelector('.content') !== null;
+                results.push({ name: 'Content area', passed: hasContentArea });
+                
+                // Test 5: No zones message (default state)
+                const noZonesMessage = card.shadowRoot.textContent.includes('No zones configured');
+                results.push({ name: 'Empty state message', passed: noZonesMessage });
+                
+            } catch (error) {
+                results.push({ name: 'UI tests', passed: false, details: error.message });
+            }
+            
+            displayResults('ui-tests', results);
+        }
+        
+        async function runDataTests() {
+            const results = [];
+            
+            try {
+                const card = createTestCard();
+                
+                // Test 1: Mock data processing
+                card.hass = mockData;
+                await new Promise(resolve => setTimeout(resolve, 100));
+                
+                const systemProcessed = card.systemStatus.totalZones === 2;
+                results.push({ name: 'System status processing', passed: systemProcessed });
+                
+                const zonesProcessed = card.zones.length === 2;
+                results.push({ name: 'Zone data processing', passed: zonesProcessed });
+                
+                const kitchenZone = card.zones.find(z => z.name === 'kitchen');
+                const hasKitchenZone = kitchenZone !== undefined;
+                results.push({ name: 'Kitchen zone extraction', passed: hasKitchenZone });
+                
+                const hasTasks = kitchenZone && kitchenZone.tasks && kitchenZone.tasks.length === 3;
+                results.push({ name: 'Task data extraction', passed: hasTasks });
+                
+                // Test 2: Re-render with data
+                await new Promise(resolve => setTimeout(resolve, 100));
+                const hasZoneCards = card.shadowRoot.querySelectorAll('.zone-card').length === 2;
+                results.push({ name: 'Zone cards rendering', passed: hasZoneCards });
+                
+            } catch (error) {
+                results.push({ name: 'Data tests', passed: false, details: error.message });
+            }
+            
+            displayResults('data-tests', results);
+        }
+        
+        async function runInteractionTests() {
+            const results = [];
+            
+            try {
+                const card = createTestCard();
+                card.hass = mockData;
+                await new Promise(resolve => setTimeout(resolve, 200));
+                
+                // Test 1: Navigation buttons
+                const navButtons = card.shadowRoot.querySelectorAll('.nav-button');
+                results.push({ name: 'Navigation buttons exist', passed: navButtons.length >= 3 });
+                
+                // Test 2: Analytics navigation
+                const analyticsBtn = card.shadowRoot.querySelector('[data-view="analytics"]');
+                if (analyticsBtn) {
+                    analyticsBtn.click();
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    const isAnalytics = card.currentView === 'analytics';
+                    results.push({ name: 'Analytics navigation', passed: isAnalytics });
+                } else {
+                    results.push({ name: 'Analytics navigation', passed: false, details: 'Button not found' });
+                }
+                
+                // Test 3: Config navigation
+                const configBtn = card.shadowRoot.querySelector('[data-view="config"]');
+                if (configBtn) {
+                    configBtn.click();
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    const isConfig = card.currentView === 'config';
+                    results.push({ name: 'Config navigation', passed: isConfig });
+                } else {
+                    results.push({ name: 'Config navigation', passed: false, details: 'Button not found' });
+                }
+                
+                // Test 4: Back to dashboard
+                const dashboardBtn = card.shadowRoot.querySelector('[data-view="dashboard"]');
+                if (dashboardBtn) {
+                    dashboardBtn.click();
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    const isDashboard = card.currentView === 'dashboard';
+                    results.push({ name: 'Dashboard navigation', passed: isDashboard });
+                } else {
+                    results.push({ name: 'Dashboard navigation', passed: false, details: 'Button not found' });
+                }
+                
+            } catch (error) {
+                results.push({ name: 'Interaction tests', passed: false, details: error.message });
+            }
+            
+            displayResults('interaction-tests', results);
+        }
+        
+        async function runAllTests() {
+            console.log('🚀 Running comprehensive test suite...');
+            await runCoreTests();
+            await runUITests();
+            await runDataTests();
+            await runInteractionTests();
+            console.log('✅ All tests completed!');
+        }
+        
+        function showDashboard() {
+            if (testCard) {
+                testCard.currentView = 'dashboard';
+                testCard.render();
+            }
+        }
+        
+        function showAnalytics() {
+            if (testCard) {
+                testCard.currentView = 'analytics';
+                testCard.render();
+            }
+        }
+        
+        function showConfig() {
+            if (testCard) {
+                testCard.currentView = 'config';
+                testCard.render();
+            }
+        }
+        
+        function addMockData() {
+            if (testCard) {
+                testCard.hass = mockData;
+            }
+            document.getElementById('mock-data-display').textContent = JSON.stringify(mockData, null, 2);
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            createTestCard();
+            document.getElementById('mock-data-display').textContent = JSON.stringify(mockData, null, 2);
+            
+            // Auto-run core tests
+            setTimeout(runCoreTests, 500);
+        });
+    </script>
+</body>
+</html>

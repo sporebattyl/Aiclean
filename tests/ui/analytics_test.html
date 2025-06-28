@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics Dashboard TDD Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #f5f5f5;
+            --primary-color: #2196F3;
+            --text-primary-color: white;
+            --card-background-color: white;
+            --secondary-background-color: #f8f9fa;
+            --primary-text-color: #212121;
+            --secondary-text-color: #757575;
+            --divider-color: #e0e0e0;
+            --success-color: #4caf50;
+            --warning-color: #ff9800;
+            --error-color: #f44336;
+        }
+        
+        .test-section {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .test-result {
+            padding: 8px 12px;
+            margin: 5px 0;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+        .pass { background: #d4edda; color: #155724; }
+        .fail { background: #f8d7da; color: #721c24; }
+        .pending { background: #fff3cd; color: #856404; }
+        
+        .analytics-container {
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            background: white;
+            min-height: 600px;
+        }
+        
+        .test-controls {
+            margin: 10px 0;
+        }
+        
+        .test-controls button {
+            margin: 5px;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            background: #2196F3;
+            color: white;
+            cursor: pointer;
+        }
+        
+        .aaa-pattern {
+            background: #f8f9fa;
+            border-left: 4px solid #2196F3;
+            padding: 10px;
+            margin: 10px 0;
+            font-family: monospace;
+            font-size: 0.85em;
+        }
+        
+        .arrange { border-left-color: #ff9800; }
+        .act { border-left-color: #2196F3; }
+        .assert { border-left-color: #4caf50; }
+    </style>
+</head>
+<body>
+    <h1>📊 Analytics Dashboard TDD Test</h1>
+    
+    <div class="test-section">
+        <h2>🧪 TDD Test Plan</h2>
+        <div class="aaa-pattern arrange">
+            <strong>ARRANGE:</strong> Create AICleaner card with historical data for charts and analytics
+        </div>
+        <div class="aaa-pattern act">
+            <strong>ACT:</strong> Switch to analytics view and initialize Chart.js components
+        </div>
+        <div class="aaa-pattern assert">
+            <strong>ASSERT:</strong> Verify charts render, insights display, and interactions work
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h2>📈 Analytics Component Tests</h2>
+        <div id="analytics-tests">
+            <div class="test-result pending">⏳ Ready to test analytics dashboard...</div>
+        </div>
+        <div class="test-controls">
+            <button onclick="testAnalyticsStructure()">Test Structure</button>
+            <button onclick="testChartInitialization()">Test Charts</button>
+            <button onclick="testSystemInsights()">Test Insights</button>
+            <button onclick="testAnalyticsInteractions()">Test Interactions</button>
+            <button onclick="runAllAnalyticsTests()">🚀 Run All Tests</button>
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h2>🎨 Live Analytics Preview</h2>
+        <div class="test-controls">
+            <button onclick="showAnalytics()">Show Analytics</button>
+            <button onclick="addMockData()">Add Mock Data</button>
+            <button onclick="refreshCharts()">Refresh Charts</button>
+        </div>
+        <div class="analytics-container" id="analytics-container">
+            <!-- Analytics card will be rendered here -->
+        </div>
+    </div>
+
+    <!-- Load Chart.js for analytics -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    
+    <!-- Load the card -->
+    <script src="aicleaner-card.js"></script>
+    
+    <script>
+        let analyticsCard = null;
+        const analyticsResults = [];
+        
+        // Mock data with historical trends for charts
+        const mockAnalyticsData = {
+            states: {
+                'sensor.aicleaner_system_status': {
+                    state: 'active',
+                    attributes: {
+                        total_zones: 3,
+                        total_active_tasks: 8,
+                        total_completed_tasks: 25,
+                        global_completion_rate: 0.76,
+                        average_efficiency_score: 0.82,
+                        last_analysis: new Date(Date.now() - 900000).toISOString(), // 15 min ago
+                        version: '2.0.0'
+                    }
+                },
+                'sensor.aicleaner_kitchen_tasks': {
+                    state: '2',
+                    attributes: {
+                        zone_name: 'Kitchen',
+                        active_tasks: 2,
+                        completed_tasks: 8,
+                        completion_rate: 0.8,
+                        efficiency_score: 0.85
+                    }
+                },
+                'sensor.aicleaner_living_room_tasks': {
+                    state: '3',
+                    attributes: {
+                        zone_name: 'Living Room',
+                        active_tasks: 3,
+                        completed_tasks: 10,
+                        completion_rate: 0.77,
+                        efficiency_score: 0.78
+                    }
+                },
+                'sensor.aicleaner_bedroom_tasks': {
+                    state: '3',
+                    attributes: {
+                        zone_name: 'Bedroom',
+                        active_tasks: 3,
+                        completed_tasks: 7,
+                        completion_rate: 0.7,
+                        efficiency_score: 0.83
+                    }
+                }
+            }
+        };
+        
+        function addAnalyticsResult(name, passed, details = '') {
+            analyticsResults.push({ name, passed, details });
+            updateAnalyticsDisplay();
+            console.log(`${passed ? '✅' : '❌'} ${name}${details ? ': ' + details : ''}`);
+        }
+        
+        function updateAnalyticsDisplay() {
+            const container = document.getElementById('analytics-tests');
+            const passed = analyticsResults.filter(r => r.passed).length;
+            const total = analyticsResults.length;
+            
+            container.innerHTML = `
+                <div class="test-result ${passed === total ? 'pass' : 'fail'}">
+                    Analytics Tests: ${passed}/${total} passed
+                </div>
+                ${analyticsResults.map(result => `
+                    <div class="test-result ${result.passed ? 'pass' : 'fail'}">
+                        ${result.passed ? '✅' : '❌'} ${result.name}
+                        ${result.details ? `<br><small>${result.details}</small>` : ''}
+                    </div>
+                `).join('')}
+            `;
+        }
+        
+        function createAnalyticsCard() {
+            if (analyticsCard) {
+                analyticsCard.remove();
+            }
+            
+            analyticsCard = document.createElement('aicleaner-card');
+            analyticsCard.setConfig({
+                title: 'Analytics Test Card',
+                show_analytics: true
+            });
+            
+            const container = document.getElementById('analytics-container');
+            container.innerHTML = '';
+            container.appendChild(analyticsCard);
+            
+            return analyticsCard;
+        }
+        
+        // AAA Pattern: Test Analytics Structure
+        async function testAnalyticsStructure() {
+            console.log('🧪 Testing analytics structure...');
+            
+            try {
+                // ARRANGE: Create card and switch to analytics view
+                const card = createAnalyticsCard();
+                card.hass = mockAnalyticsData;
+                card.currentView = 'analytics';
+                
+                // ACT: Render analytics view
+                await new Promise(resolve => setTimeout(resolve, 200));
+                
+                // ASSERT: Check analytics structure
+                const analyticsGrid = card.shadowRoot.querySelector('.analytics-grid');
+                addAnalyticsResult('Analytics grid exists', analyticsGrid !== null);
+                
+                const analyticsSections = card.shadowRoot.querySelectorAll('.analytics-section');
+                addAnalyticsResult('Analytics sections exist', analyticsSections.length >= 3);
+                
+                const chartContainers = card.shadowRoot.querySelectorAll('.chart-container');
+                addAnalyticsResult('Chart containers exist', chartContainers.length >= 2);
+                
+                const insightsPanel = card.shadowRoot.querySelector('.insights-grid');
+                addAnalyticsResult('System insights panel exists', insightsPanel !== null);
+                
+            } catch (error) {
+                addAnalyticsResult('Analytics structure test', false, error.message);
+            }
+        }
+        
+        // AAA Pattern: Test Chart Initialization
+        async function testChartInitialization() {
+            console.log('🧪 Testing chart initialization...');
+            
+            try {
+                // ARRANGE: Ensure Chart.js is loaded and card is in analytics view
+                const card = createAnalyticsCard();
+                card.hass = mockAnalyticsData;
+                card.currentView = 'analytics';
+                
+                // ACT: Wait for charts to initialize
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                // ASSERT: Check chart elements
+                const chartCanvases = card.shadowRoot.querySelectorAll('canvas');
+                addAnalyticsResult('Chart canvases exist', chartCanvases.length >= 2);
+                
+                const completionChart = card.shadowRoot.getElementById('completion-trend-chart');
+                addAnalyticsResult('Completion trend chart exists', completionChart !== null);
+                
+                const performanceChart = card.shadowRoot.getElementById('zone-performance-chart');
+                addAnalyticsResult('Zone performance chart exists', performanceChart !== null);
+                
+                const timelineChart = card.shadowRoot.getElementById('activity-timeline-chart');
+                addAnalyticsResult('Activity timeline chart exists', timelineChart !== null);
+                
+                // Check if Chart.js is available
+                const chartJSLoaded = typeof Chart !== 'undefined';
+                addAnalyticsResult('Chart.js library loaded', chartJSLoaded);
+                
+            } catch (error) {
+                addAnalyticsResult('Chart initialization test', false, error.message);
+            }
+        }
+        
+        // AAA Pattern: Test System Insights
+        async function testSystemInsights() {
+            console.log('🧪 Testing system insights...');
+            
+            try {
+                // ARRANGE: Create card with analytics data
+                const card = createAnalyticsCard();
+                card.hass = mockAnalyticsData;
+                card.currentView = 'analytics';
+                
+                // ACT: Render insights
+                await new Promise(resolve => setTimeout(resolve, 200));
+                
+                // ASSERT: Check insights content
+                const insightCards = card.shadowRoot.querySelectorAll('.insight-card');
+                addAnalyticsResult('Insight cards exist', insightCards.length >= 3);
+                
+                const insightValues = card.shadowRoot.querySelectorAll('.insight-value');
+                addAnalyticsResult('Insight values display', insightValues.length >= 3);
+                
+                const insightLabels = card.shadowRoot.querySelectorAll('.insight-label');
+                addAnalyticsResult('Insight labels display', insightLabels.length >= 3);
+                
+                // Check for specific insights
+                const completionRate = card.shadowRoot.textContent.includes('76%') || card.shadowRoot.textContent.includes('Completion Rate');
+                addAnalyticsResult('Completion rate insight shows', completionRate);
+                
+                const efficiency = card.shadowRoot.textContent.includes('82%') || card.shadowRoot.textContent.includes('Efficiency');
+                addAnalyticsResult('Efficiency insight shows', efficiency);
+                
+            } catch (error) {
+                addAnalyticsResult('System insights test', false, error.message);
+            }
+        }
+        
+        // AAA Pattern: Test Analytics Interactions
+        async function testAnalyticsInteractions() {
+            console.log('🧪 Testing analytics interactions...');
+            
+            try {
+                // ARRANGE: Create card with full data
+                const card = createAnalyticsCard();
+                card.hass = mockAnalyticsData;
+                card.currentView = 'analytics';
+                
+                // ACT: Test navigation back to dashboard
+                await new Promise(resolve => setTimeout(resolve, 200));
+                
+                const dashboardBtn = card.shadowRoot.querySelector('[data-view="dashboard"]');
+                if (dashboardBtn) {
+                    dashboardBtn.click();
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    
+                    // ASSERT: Navigation works
+                    addAnalyticsResult('Navigation from analytics works', card.currentView === 'dashboard');
+                    
+                    // Switch back to analytics
+                    const analyticsBtn = card.shadowRoot.querySelector('[data-view="analytics"]');
+                    if (analyticsBtn) {
+                        analyticsBtn.click();
+                        await new Promise(resolve => setTimeout(resolve, 100));
+                        addAnalyticsResult('Navigation to analytics works', card.currentView === 'analytics');
+                    }
+                } else {
+                    addAnalyticsResult('Analytics navigation test', false, 'Navigation buttons not found');
+                }
+                
+            } catch (error) {
+                addAnalyticsResult('Analytics interactions test', false, error.message);
+            }
+        }
+        
+        async function runAllAnalyticsTests() {
+            console.log('🚀 Running all analytics tests...');
+            analyticsResults.length = 0; // Clear previous results
+            
+            await testAnalyticsStructure();
+            await testChartInitialization();
+            await testSystemInsights();
+            await testAnalyticsInteractions();
+            
+            const passed = analyticsResults.filter(r => r.passed).length;
+            const total = analyticsResults.length;
+            
+            console.log(`📊 Analytics Tests Complete: ${passed}/${total} passed`);
+        }
+        
+        function showAnalytics() {
+            if (analyticsCard) {
+                analyticsCard.currentView = 'analytics';
+                analyticsCard.render();
+            }
+        }
+        
+        function addMockData() {
+            if (analyticsCard) {
+                analyticsCard.hass = mockAnalyticsData;
+            }
+        }
+        
+        function refreshCharts() {
+            if (analyticsCard && analyticsCard.currentView === 'analytics') {
+                analyticsCard.render();
+            }
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            createAnalyticsCard();
+            
+            // Auto-run structure test
+            setTimeout(testAnalyticsStructure, 1000);
+        });
+    </script>
+</body>
+</html>

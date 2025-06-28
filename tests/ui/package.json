@@ -1,0 +1,20 @@
+{
+  "name": "aicleaner-ui-tests",
+  "version": "1.0.0",
+  "description": "TDD UI tests for AICleaner Lovelace card",
+  "main": "run_tests.js",
+  "scripts": {
+    "test": "node run_tests.js",
+    "test:watch": "nodemon run_tests.js",
+    "test:headless": "HEADLESS=true node run_tests.js"
+  },
+  "dependencies": {
+    "puppeteer": "^21.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.0"
+  },
+  "keywords": ["tdd", "ui-testing", "home-assistant", "lovelace"],
+  "author": "AICleaner Team",
+  "license": "MIT"
+}

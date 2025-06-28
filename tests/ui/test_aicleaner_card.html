@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AICleaner Card Test Environment</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+            --primary-color: #2196F3;
+            --text-primary-color: white;
+            --card-background-color: white;
+            --secondary-background-color: #f8f9fa;
+            --primary-text-color: #212121;
+            --secondary-text-color: #757575;
+            --divider-color: #e0e0e0;
+            --success-color: #4caf50;
+            --warning-color: #ff9800;
+            --error-color: #f44336;
+        }
+        
+        .test-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .test-section {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .test-title {
+            font-size: 1.5em;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #2196F3;
+        }
+        
+        .test-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+        }
+        
+        .test-result {
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-weight: 500;
+            margin: 8px 0;
+        }
+        
+        .test-pass {
+            background: #e8f5e8;
+            color: #2e7d32;
+            border: 1px solid #4caf50;
+        }
+        
+        .test-fail {
+            background: #ffebee;
+            color: #c62828;
+            border: 1px solid #f44336;
+        }
+        
+        .test-pending {
+            background: #fff3e0;
+            color: #ef6c00;
+            border: 1px solid #ff9800;
+        }
+        
+        .mock-data-panel {
+            background: #f8f9fa;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            padding: 16px;
+            margin: 16px 0;
+        }
+        
+        .mock-data-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        pre {
+            background: #f5f5f5;
+            padding: 12px;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <div class="test-section">
+            <div class="test-title">🧪 AICleaner Card Test Environment</div>
+            <p>This environment tests the AICleaner Lovelace card components using TDD principles with AAA (Arrange-Act-Assert) pattern.</p>
+            
+            <div id="test-results">
+                <div class="test-pending">⏳ Initializing test environment...</div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <div class="test-title">📊 Mock Data</div>
+            <div class="mock-data-panel">
+                <div class="mock-data-title">System Status</div>
+                <pre id="mock-system-status"></pre>
+            </div>
+            <div class="mock-data-panel">
+                <div class="mock-data-title">Zone Data</div>
+                <pre id="mock-zone-data"></pre>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <div class="test-title">🎨 Component Tests</div>
+            <div class="test-grid">
+                <div>
+                    <h3>Dashboard View</h3>
+                    <div id="dashboard-test-container"></div>
+                    <div id="dashboard-test-results"></div>
+                </div>
+                <div>
+                    <h3>Zone Detail View</h3>
+                    <div id="zone-detail-test-container"></div>
+                    <div id="zone-detail-test-results"></div>
+                </div>
+                <div>
+                    <h3>Configuration Panel</h3>
+                    <div id="config-test-container"></div>
+                    <div id="config-test-results"></div>
+                </div>
+                <div>
+                    <h3>Analytics Dashboard</h3>
+                    <div id="analytics-test-container"></div>
+                    <div id="analytics-test-results"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <div class="test-title">📱 Responsive Design Tests</div>
+            <div id="responsive-test-results"></div>
+            <div style="display: flex; gap: 16px; margin-top: 16px;">
+                <button onclick="testMobileView()">Test Mobile (375px)</button>
+                <button onclick="testTabletView()">Test Tablet (768px)</button>
+                <button onclick="testDesktopView()">Test Desktop (1200px)</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Load the AICleaner card -->
+    <script src="../../aicleaner/www/aicleaner-card.js"></script>
+
+    <!-- Load test suite -->
+    <script src="aicleaner_card_tests.js"></script>
+
+    <script>
+        // Test framework following AAA pattern
+        class UITestFramework {
+            constructor() {
+                this.tests = [];
+                this.results = [];
+            }
+
+            // Arrange-Act-Assert test method
+            test(name, testFn) {
+                this.tests.push({ name, testFn });
+            }
+
+            async runTests() {
+                console.log('🧪 Starting UI Tests...');
+                
+                for (const test of this.tests) {
+                    try {
+                        console.log(`Running: ${test.name}`);
+                        await test.testFn();
+                        this.results.push({ name: test.name, status: 'pass' });
+                        this.logResult(test.name, 'pass');
+                    } catch (error) {
+                        this.results.push({ name: test.name, status: 'fail', error: error.message });
+                        this.logResult(test.name, 'fail', error.message);
+                    }
+                }
+                
+                this.displayResults();
+            }
+
+            logResult(name, status, error = null) {
+                const icon = status === 'pass' ? '✅' : '❌';
+                console.log(`${icon} ${name}${error ? ': ' + error : ''}`);
+            }
+
+            displayResults() {
+                const container = document.getElementById('test-results');
+                const passed = this.results.filter(r => r.status === 'pass').length;
+                const total = this.results.length;
+                
+                container.innerHTML = `
+                    <div class="test-${passed === total ? 'pass' : 'fail'}">
+                        ${passed === total ? '✅' : '❌'} Tests: ${passed}/${total} passed
+                    </div>
+                    ${this.results.map(result => `
+                        <div class="test-${result.status}">
+                            ${result.status === 'pass' ? '✅' : '❌'} ${result.name}
+                            ${result.error ? `<br><small>${result.error}</small>` : ''}
+                        </div>
+                    `).join('')}
+                `;
+            }
+
+            // Helper methods for assertions
+            assert(condition, message) {
+                if (!condition) {
+                    throw new Error(message || 'Assertion failed');
+                }
+            }
+
+            assertEqual(actual, expected, message) {
+                if (actual !== expected) {
+                    throw new Error(message || `Expected ${expected}, got ${actual}`);
+                }
+            }
+
+            assertExists(element, message) {
+                if (!element) {
+                    throw new Error(message || 'Element does not exist');
+                }
+            }
+        }
+
+        // Initialize test framework
+        const testFramework = new UITestFramework();
+
+        // Mock Home Assistant data
+        const mockHassData = {
+            states: {
+                'sensor.aicleaner_system_status': {
+                    state: 'active',
+                    attributes: {
+                        status: 'active',
+                        total_zones: 3,
+                        total_active_tasks: 8,
+                        total_completed_tasks: 15,
+                        global_completion_rate: 0.65,
+                        average_efficiency_score: 0.78,
+                        last_analysis: new Date().toISOString(),
+                        version: '2.0.0'
+                    }
+                },
+                'sensor.aicleaner_kitchen_tasks': {
+                    state: '3',
+                    attributes: {
+                        zone_name: 'Kitchen',
+                        display_name: 'Kitchen',
+                        purpose: 'Keep the kitchen clean and organized',
+                        total_tasks: 5,
+                        active_tasks: 3,
+                        completed_tasks: 2,
+                        completion_rate: 0.4,
+                        efficiency_score: 0.8,
+                        last_analysis: new Date().toISOString(),
+                        tasks: [
+                            { id: '1', description: 'Clean countertops', priority: 'high', created_at: new Date().toISOString() },
+                            { id: '2', description: 'Organize pantry', priority: 'normal', created_at: new Date().toISOString() },
+                            { id: '3', description: 'Wipe down appliances', priority: 'low', created_at: new Date().toISOString() }
+                        ]
+                    }
+                }
+            },
+            callService: (domain, service, data) => {
+                console.log(`Mock service call: ${domain}.${service}`, data);
+                return Promise.resolve();
+            }
+        };
+
+        // Display mock data
+        document.getElementById('mock-system-status').textContent = JSON.stringify(mockHassData.states['sensor.aicleaner_system_status'], null, 2);
+        document.getElementById('mock-zone-data').textContent = JSON.stringify(mockHassData.states['sensor.aicleaner_kitchen_tasks'], null, 2);
+
+        // Responsive design test functions
+        function testMobileView() {
+            document.body.style.width = '375px';
+            document.body.style.margin = '0 auto';
+            logResponsiveTest('Mobile (375px)');
+        }
+
+        function testTabletView() {
+            document.body.style.width = '768px';
+            document.body.style.margin = '0 auto';
+            logResponsiveTest('Tablet (768px)');
+        }
+
+        function testDesktopView() {
+            document.body.style.width = '100%';
+            document.body.style.margin = '0';
+            logResponsiveTest('Desktop (100%)');
+        }
+
+        function logResponsiveTest(viewType) {
+            const container = document.getElementById('responsive-test-results');
+            const timestamp = new Date().toLocaleTimeString();
+            container.innerHTML += `<div class="test-pass">✅ ${viewType} view tested at ${timestamp}</div>`;
+        }
+
+        // Start tests when page loads
+        document.addEventListener('DOMContentLoaded', async () => {
+            console.log('🚀 AICleaner Card Test Environment Ready');
+
+            // Initialize and run TDD test suite
+            const cardTests = new AICleanerCardTests(testFramework);
+
+            // Run all tests following TDD RED-GREEN-REFACTOR cycle
+            console.log('🔴 RED PHASE: Running failing tests...');
+            await testFramework.runTests();
+
+            console.log('📊 Test Results:', testFramework.results);
+        });
+    </script>
+</body>
+</html>

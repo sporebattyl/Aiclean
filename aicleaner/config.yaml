@@ -54,3 +54,14 @@ schema:
       notification_personality: list(default|snarky|jarvis|roaster|butler|coach|zen)
       notify_on_create: bool
       notify_on_complete: bool
+
+      # Optional: Monitor AICleaner status
+sensor:
+  - platform: file
+    name: "AICleaner Status"
+    file_path: "/tmp/aicleaner_triggers/status.json"
+    value_template: "{{ value_json.status }}"
+    json_attributes:
+      - message
+      - timestamp
+      - zones

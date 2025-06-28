@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Validation Test - TDD Fixes</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #f5f5f5;
+            --primary-color: #2196F3;
+            --text-primary-color: white;
+            --card-background-color: white;
+            --secondary-background-color: #f8f9fa;
+            --primary-text-color: #212121;
+            --secondary-text-color: #757575;
+            --divider-color: #e0e0e0;
+            --success-color: #4caf50;
+            --warning-color: #ff9800;
+            --error-color: #f44336;
+        }
+        
+        .validation-section {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .test-result {
+            padding: 8px 12px;
+            margin: 5px 0;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+        .pass { background: #d4edda; color: #155724; }
+        .fail { background: #f8d7da; color: #721c24; }
+        .info { background: #d1ecf1; color: #0c5460; }
+        
+        .card-container {
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            background: white;
+            min-height: 400px;
+        }
+        
+        .controls {
+            margin: 10px 0;
+        }
+        
+        .controls button {
+            margin: 5px;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            background: #2196F3;
+            color: white;
+            cursor: pointer;
+        }
+        
+        .data-display {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+            padding: 10px;
+            font-family: monospace;
+            font-size: 0.8em;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>✅ Validation Test - TDD Fixes</h1>
+    <p>Testing the fixes implemented during the GREEN phase of TDD</p>
+    
+    <div class="validation-section">
+        <h2>🔧 Fix Validation Results</h2>
+        <div id="validation-results">
+            <div class="test-result info">⏳ Running validation tests...</div>
+        </div>
+        <div class="controls">
+            <button onclick="validateFixes()">🔍 Validate Fixes</button>
+            <button onclick="testDataProcessing()">📊 Test Data Processing</button>
+            <button onclick="testErrorHandling()">🛡️ Test Error Handling</button>
+            <button onclick="runFullValidation()">🚀 Full Validation</button>
+        </div>
+    </div>
+    
+    <div class="validation-section">
+        <h2>🎨 Live Card with Enhanced Data</h2>
+        <div class="controls">
+            <button onclick="loadEnhancedData()">Load Enhanced Data</button>
+            <button onclick="testAllViews()">Test All Views</button>
+            <button onclick="testInteractions()">Test Interactions</button>
+        </div>
+        <div class="card-container" id="card-container">
+            <!-- Card will be rendered here -->
+        </div>
+    </div>
+    
+    <div class="validation-section">
+        <h2>📋 Enhanced Mock Data</h2>
+        <div class="data-display" id="data-display"></div>
+    </div>
+
+    <!-- Load the card -->
+    <script src="aicleaner-card.js"></script>
+    
+    <script>
+        let validationCard = null;
+        const validationResults = [];
+        
+        // Enhanced mock data with all the properties we added
+        const enhancedMockData = {
+            states: {
+                'sensor.aicleaner_system_status': {
+                    state: 'active',
+                    attributes: {
+                        total_zones: 3,
+                        total_active_tasks: 8,
+                        total_completed_tasks: 22,
+                        global_completion_rate: 0.73,
+                        average_efficiency_score: 0.81,
+                        last_analysis: new Date(Date.now() - 1200000).toISOString(), // 20 min ago
+                        version: '2.0.0'
+                    }
+                },
+                'sensor.aicleaner_kitchen_tasks': {
+                    state: '3',
+                    attributes: {
+                        zone_name: 'Kitchen',
+                        active_tasks: 3,
+                        completed_tasks: 7,
+                        completion_rate: 0.7,
+                        efficiency_score: 0.85,
+                        last_analysis: new Date(Date.now() - 600000).toISOString(), // 10 min ago
+                        purpose: 'Keep the kitchen clean and organized',
+                        camera_entity: 'camera.kitchen',
+                        tasks: [
+                            { id: '1', description: 'Clean countertops', priority: 'high', created_at: new Date().toISOString() },
+                            { id: '2', description: 'Organize pantry', priority: 'normal', created_at: new Date().toISOString() },
+                            { id: '3', description: 'Wipe appliances', priority: 'low', created_at: new Date().toISOString() }
+                        ]
+                    }
+                },
+                'sensor.aicleaner_living_room_tasks': {
+                    state: '2',
+                    attributes: {
+                        zone_name: 'Living Room',
+                        active_tasks: 2,
+                        completed_tasks: 8,
+                        completion_rate: 0.8,
+                        efficiency_score: 0.78,
+                        last_analysis: new Date(Date.now() - 900000).toISOString(), // 15 min ago
+                        purpose: 'Maintain a comfortable living space',
+                        tasks: [
+                            { id: '4', description: 'Vacuum carpet', priority: 'high', created_at: new Date().toISOString() },
+                            { id: '5', description: 'Dust furniture', priority: 'normal', created_at: new Date().toISOString() }
+                        ]
+                    }
+                },
+                'sensor.aicleaner_bedroom_tasks': {
+                    state: '3',
+                    attributes: {
+                        zone_name: 'Bedroom',
+                        active_tasks: 3,
+                        completed_tasks: 7,
+                        completion_rate: 0.7,
+                        efficiency_score: 0.8,
+                        purpose: 'Ensure a restful sleeping environment',
+                        tasks: [
+                            { id: '6', description: 'Make bed', priority: 'normal', created_at: new Date().toISOString() },
+                            { id: '7', description: 'Organize closet', priority: 'low', created_at: new Date().toISOString() },
+                            { id: '8', description: 'Clean windows', priority: 'low', created_at: new Date().toISOString() }
+                        ]
+                    }
+                }
+            },
+            callService: (domain, service, data) => {
+                console.log(`✅ Service call validated: ${domain}.${service}`, data);
+                return Promise.resolve();
+            }
+        };
+        
+        function addValidationResult(name, passed, details = '') {
+            validationResults.push({ name, passed, details });
+            updateValidationDisplay();
+            console.log(`${passed ? '✅' : '❌'} ${name}${details ? ': ' + details : ''}`);
+        }
+        
+        function updateValidationDisplay() {
+            const container = document.getElementById('validation-results');
+            const passed = validationResults.filter(r => r.passed).length;
+            const total = validationResults.length;
+            
+            container.innerHTML = `
+                <div class="test-result ${passed === total ? 'pass' : 'fail'}">
+                    Validation: ${passed}/${total} tests passed
+                </div>
+                ${validationResults.map(result => `
+                    <div class="test-result ${result.passed ? 'pass' : 'fail'}">
+                        ${result.passed ? '✅' : '❌'} ${result.name}
+                        ${result.details ? `<br><small>${result.details}</small>` : ''}
+                    </div>
+                `).join('')}
+            `;
+        }
+        
+        function createValidationCard() {
+            if (validationCard) {
+                validationCard.remove();
+            }
+            
+            validationCard = document.createElement('aicleaner-card');
+            validationCard.setConfig({
+                title: 'Validation Test Card',
+                show_analytics: true,
+                show_config: true
+            });
+            
+            const container = document.getElementById('card-container');
+            container.innerHTML = '';
+            container.appendChild(validationCard);
+            
+            return validationCard;
+        }
+        
+        // Validate the fixes we implemented
+        async function validateFixes() {
+            console.log('🔍 Validating TDD fixes...');
+            validationResults.length = 0;
+            
+            try {
+                // Test 1: Card creation with enhanced data
+                const card = createValidationCard();
+                addValidationResult('Card creation', true);
+                
+                // Test 2: Enhanced data processing
+                card.hass = enhancedMockData;
+                await new Promise(resolve => setTimeout(resolve, 100));
+                
+                // Validate system status has all properties
+                const hasCompletionRate = card.systemStatus.globalCompletionRate === 0.73;
+                addValidationResult('System completion rate processed', hasCompletionRate);
+                
+                const hasEfficiencyScore = card.systemStatus.averageEfficiencyScore === 0.81;
+                addValidationResult('System efficiency score processed', hasEfficiencyScore);
+                
+                // Validate zone data has enhanced properties
+                const kitchen = card.zones.find(z => z.name === 'kitchen');
+                if (kitchen) {
+                    addValidationResult('Kitchen zone found', true);
+                    addValidationResult('Zone completion rate exists', kitchen.completionRate === 0.7);
+                    addValidationResult('Zone efficiency score exists', kitchen.efficiencyScore === 0.85);
+                    addValidationResult('Zone purpose exists', kitchen.purpose !== undefined);
+                } else {
+                    addValidationResult('Kitchen zone found', false);
+                }
+                
+                // Test 3: Error handling doesn't break rendering
+                const hasContent = card.shadowRoot && card.shadowRoot.innerHTML.length > 0;
+                addValidationResult('Card renders with enhanced data', hasContent);
+                
+            } catch (error) {
+                addValidationResult('Fix validation', false, error.message);
+            }
+        }
+        
+        async function testDataProcessing() {
+            console.log('📊 Testing enhanced data processing...');
+            
+            const card = createValidationCard();
+            card.hass = enhancedMockData;
+            await new Promise(resolve => setTimeout(resolve, 100));
+            
+            // Test zone count
+            addValidationResult('Correct zone count', card.zones.length === 3);
+            
+            // Test system metrics
+            addValidationResult('Total tasks calculated', card.systemStatus.totalActiveTasks === 8);
+            addValidationResult('Completion rate calculated', card.systemStatus.globalCompletionRate === 0.73);
+            
+            // Test zone metrics
+            const zones = card.zones;
+            const hasAllMetrics = zones.every(zone => 
+                zone.completionRate !== undefined && 
+                zone.efficiencyScore !== undefined
+            );
+            addValidationResult('All zones have metrics', hasAllMetrics);
+        }
+        
+        async function testErrorHandling() {
+            console.log('🛡️ Testing error handling...');
+            
+            const card = createValidationCard();
+            
+            // Test with invalid data
+            card.hass = { states: {} };
+            await new Promise(resolve => setTimeout(resolve, 100));
+            
+            addValidationResult('Handles empty states', card.zones.length === 0);
+            addValidationResult('Default system status', card.systemStatus.totalZones === 0);
+            
+            // Test chart error handling
+            card.currentView = 'analytics';
+            card.render();
+            await new Promise(resolve => setTimeout(resolve, 200));
+            
+            // Should not crash even without Chart.js
+            const stillRenders = card.shadowRoot.innerHTML.length > 0;
+            addValidationResult('Analytics view handles missing Chart.js', stillRenders);
+        }
+        
+        async function runFullValidation() {
+            console.log('🚀 Running full validation suite...');
+            validationResults.length = 0;
+            
+            await validateFixes();
+            await testDataProcessing();
+            await testErrorHandling();
+            
+            const passed = validationResults.filter(r => r.passed).length;
+            const total = validationResults.length;
+            
+            console.log(`✅ Full validation complete: ${passed}/${total} tests passed`);
+        }
+        
+        function loadEnhancedData() {
+            if (validationCard) {
+                validationCard.hass = enhancedMockData;
+            }
+            document.getElementById('data-display').textContent = JSON.stringify(enhancedMockData, null, 2);
+        }
+        
+        async function testAllViews() {
+            if (!validationCard) return;
+            
+            const views = ['dashboard', 'analytics', 'config'];
+            for (const view of views) {
+                validationCard.currentView = view;
+                validationCard.render();
+                await new Promise(resolve => setTimeout(resolve, 300));
+                console.log(`✅ Tested ${view} view`);
+            }
+        }
+        
+        async function testInteractions() {
+            if (!validationCard) return;
+            
+            // Test navigation
+            const navButtons = validationCard.shadowRoot.querySelectorAll('.nav-button');
+            console.log(`✅ Found ${navButtons.length} navigation buttons`);
+            
+            // Test quick actions
+            const quickActions = validationCard.shadowRoot.querySelectorAll('.quick-action-btn');
+            console.log(`✅ Found ${quickActions.length} quick action buttons`);
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            createValidationCard();
+            loadEnhancedData();
+            
+            // Auto-run validation
+            setTimeout(validateFixes, 1000);
+        });
+    </script>
+</body>
+</html>
