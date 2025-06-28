@@ -146,7 +146,9 @@ cython_debug/
 .env.development
 .env.test
 .env.production
+.env.secrets
 !.env.mcp
+!.env.secrets.template
 
 # Home Assistant specific
 secrets.yaml
