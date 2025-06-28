@@ -277,8 +277,27 @@ curl -X PATCH "https://api.notion.com/v1/blocks/BLOCK_ID" \
 ```
 
 #### **Environment Variables Available:**
-- `NOTION_TOKEN`: ntn_b94830069485lpggmhgzowoeU0wyoSq8mTayfEQEnk56tx
+**IMPORTANT:** Sensitive information is now managed securely via `.env.secrets`
+
+**Setup Required:**
+```bash
+# Copy template and add your actual API keys
+cp .env.secrets.template .env.secrets
+# Edit .env.secrets with real tokens, then:
+source .env.mcp
+```
+
+**Available Variables:**
+- `NOTION_TOKEN`: Loaded from .env.secrets (secure)
 - `NOTION_PAGE_ID`: 2202353b-33e4-8014-9b1f-d31d4cbb309d (Main Hub)
+- `GITHUB_PERSONAL_ACCESS_TOKEN`: Loaded from .env.secrets (secure)
+- `BRAVE_API_KEY`: Loaded from .env.secrets (secure)
+
+**Security Features:**
+- ✅ `.env.secrets` never committed to version control
+- ✅ Automatic fallback to placeholders if secrets missing
+- ✅ Clear setup documentation in `SECRETS_SETUP.md`
+- ✅ Template file for easy onboarding
 
 ### **Home Assistant Testing:**
 ```bash
