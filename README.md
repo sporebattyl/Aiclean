@@ -43,6 +43,21 @@ Before starting the add-on, you must configure it with the necessary API keys an
     *   A new sensor (e.g., `sensor.room_cleanliness_score`) will appear in your Home Assistant dashboard.
     *   The to-do list you specified will be populated with cleaning tasks.
 
-## For Developers
+## 📚 Documentation
 
-This project's technical design, including its architecture, testing strategy, and API patterns, is detailed in the [`DesignDocument.md`](DesignDocument.md) file.
+- **[📋 Complete Documentation](docs/README.md)** - Comprehensive documentation hub
+- **[🔧 Configuration Guide](CONFIGURATION_GUIDE.md)** - Detailed configuration instructions
+- **[🏗️ Design Document](DesignDocument.md)** - Technical architecture and design
+- **[🧪 Testing Plan](TestingPlan.md)** - Testing procedures and strategies
+- **[🎨 Lovelace Setup](LOVELACE_SETUP.md)** - Frontend card setup guide
+
+## 🚀 Development Setup
+
+- **[🔒 Secrets Setup](docs/setup/SECRETS_SETUP.md)** - Secure API key management
+- **[⚙️ MCP Setup](docs/setup/FINAL_MCP_COMPLETE_SETUP.md)** - Complete MCP server configuration
+- **[🤖 Agent Instructions](NEXT_AGENT_PROMPT.md)** - Comprehensive development guide
+
+## 📊 Project Management
+
+- **[Notion Workspace](https://www.notion.so/AICleaner-Development-Hub-2202353b33e480149b1fd31d4cbb309d)** - Complete project tracking with 5 databases
+- **[GitHub Repository](https://github.com/sporebattyl/Aiclean)** - Source code and issue tracking

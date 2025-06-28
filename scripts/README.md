@@ -6,7 +6,6 @@ This directory contains utility scripts organized by type.
 
 - **python/** - Python utility scripts for Home Assistant integration
 - **js/** - JavaScript scripts for testing MCP servers
-- **utilities/** - General utility scripts
 
 ## Python Scripts
 
